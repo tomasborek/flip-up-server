@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  phone     String?   @unique
+  username  String @unique
+  lastActive DateTime
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+  location String?
+  bio      String?
+  avatar   String?
+  socials  Social[]
+  ratings  Rating[]
+  listings Listing[]
+  following User[] @relation("Following")
+  followers User[] @relation("Following")
+}
+
+model Social {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Listing{
+  id        Int      @id @default(autoincrement())
+  title     String
+  description String?
+  location  String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  images    Image[]
+  category  Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
+
+model Image{
+  id        Int      @id @default(autoincrement())
+  url       String
+  main Boolean  @default(false)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId Int
+}
+
+model Category{
+  id        Int      @id @default(autoincrement())
+  title     String
+  parentCategories Category[] @relation("SubCategories")
+  subCategories Category[] @relation("SubCategories")
+  listings Listing[]
+  applicable Boolean @default(false)
+  icon String?
+  core Boolean @default(false)
+}
+
+
+
+
+

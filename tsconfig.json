@@ -1,0 +1,26 @@
+{
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
+  "compilerOptions": {
+    "target": "es5",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "rootDir": "./",
+    "baseUrl": ".",
+    "paths": {
+      "@routes/*": ["src/routes/*"],
+      "@db/*": ["src/common/db/*"],
+      "@interfaces/*": ["src/common/interfaces/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@lib/*": ["src/common/lib/*"]
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["./types"],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}
