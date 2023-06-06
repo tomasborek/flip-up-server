@@ -8,6 +8,9 @@ export const getListings = async (req: Request, res: Response) => {
 
   try {
     const listings = await prisma.listing.findMany({
+      where: {
+        ...(query.category ? { categoryId: Number(query.category) } : null),
+      },
       ...(query.include
         ? {
             include: {
@@ -28,4 +31,5 @@ export const getListings = async (req: Request, res: Response) => {
 
 export const getListingsQuerySchema = z.object({
   include: z.array(z.enum(["user", "images", "category"])).optional(),
+  category: z.string().optional(),
 });
