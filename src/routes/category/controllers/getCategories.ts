@@ -11,17 +11,37 @@ export const getCategories = async (req: Request, res: Response) => {
       where: {
         core: true,
       },
-      include: {
-        subCategories: {
-          include: {
-            subCategories: {
-              include: {
-                subCategories: true,
+      ...(Number(query.levels) === 1
+        ? {
+            include: {
+              subCategories: true,
+            },
+          }
+        : Number(query.levels) === 2
+        ? {
+            include: {
+              subCategories: {
+                include: {
+                  subCategories: true,
+                },
               },
             },
-          },
-        },
-      },
+          }
+        : Number(query.levels) === 3
+        ? {
+            include: {
+              subCategories: {
+                include: {
+                  subCategories: {
+                    include: {
+                      subCategories: true,
+                    },
+                  },
+                },
+              },
+            },
+          }
+        : {}),
     });
     return res.status(200).json({ categories });
   } catch (error) {
@@ -30,6 +50,5 @@ export const getCategories = async (req: Request, res: Response) => {
 };
 
 export const getCategoriesQuerySchema = z.object({
-  parentCategoryId: z.number().optional(),
-  parentCategoryName: z.string().optional(),
+  levels: z.string().optional(),
 });
