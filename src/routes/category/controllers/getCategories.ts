@@ -51,11 +51,11 @@ export const getCategories = async (req: Request, res: Response) => {
       where: {
         core: query.core ? true : undefined,
       },
-      ...(include ? { include } : {}),
+      ...(Object.keys(include).length ? { include } : {}),
+      orderBy: {title: "asc"}
     });
     return res.status(200).json({ categories });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

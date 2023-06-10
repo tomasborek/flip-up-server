@@ -10,8 +10,13 @@ import {
   createCategoriesSchema,
 } from "./controllers/createCategories";
 import { checkData } from "@middlewares/checkData";
+import { deleteCategory } from "./controllers/deleteCategory";
+import { createCategory, categorySchema } from "./controllers/createCategory";
+import { adminProtectedRoute } from "@middlewares/adminProtectedRoute";
 
-router.post("/", checkData(createCategoriesSchema), createCategories);
 router.get("/", checkQuery(getCategoriesQuerySchema), getCategories);
+router.use(adminProtectedRoute);
+router.delete("/:categoryId", deleteCategory);
+router.post("/", checkData(categorySchema), createCategory);
 
 export default router;

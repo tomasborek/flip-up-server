@@ -39,9 +39,3 @@ export const createCategoriesSchema = z.object({
   ),
 });
 
-const category = {
-  title: "-",
-  applicable: true,
-  icon: "-",
-  core: false,
-};

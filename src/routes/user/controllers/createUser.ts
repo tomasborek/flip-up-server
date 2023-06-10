@@ -23,6 +23,7 @@ export const createUser = async (req: Request, res: Response) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        admin: false,
       } as CurrentUser,
       process.env.JWT_SECRET || ""
     );
