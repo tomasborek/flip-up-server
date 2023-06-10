@@ -7,14 +7,45 @@ export const getListing = async (req: Request, res: Response) => {
     const listing = await prisma.listing.findUnique({
       where: { id: Number(listingId) },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            lastActive: true,
+            _count: {
+              select: { ratings: true },
+            },
+          },
+        },
         images: true,
         category: true,
+        _count: {
+          select: { likedBy: true },
+        },
       },
     });
     if (!listing) return res.status(404).json({ message: "Listing not found" });
-    res.status(200).json({ listing });
+    let liked = [];
+    if (req.user) {
+      liked = await prisma.listing.findMany({
+        where: {
+          id: Number(listingId),
+          likedBy: {
+            some: {
+              id: req.user.id,
+            },
+          },
+        },
+      });
+    }
+    const listingWithAdditionalData = {
+      ...listing,
+      liked: liked.length > 0,
+    };
+    res.status(200).json({ listing: listingWithAdditionalData });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
