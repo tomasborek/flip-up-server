@@ -9,7 +9,6 @@ export const getImage = async (req: Request, res: Response) => {
     res.writeHead(200, { "Content-Type": "image/jpeg" });
     res.end(file);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 const app = express();
 dotenv.config();
 //routers
@@ -13,7 +14,8 @@ import ListingRouter from "@routes/listing";
 import UploadRouter from "@routes/uploads";
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({ credentials: true, origin: "*" }));
+app.use(cookieParser());
 
 app.use("/auth", AuthRouter);
 app.use("/user", UserRouter);

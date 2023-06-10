@@ -30,7 +30,6 @@ export const addImages = async (req: Request, res: Response) => {
     await Promise.all(imagePromises);
     return res.status(200).json(null);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

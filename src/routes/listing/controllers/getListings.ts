@@ -10,6 +10,7 @@ export const getListings = async (req: Request, res: Response) => {
     const listings = await prisma.listing.findMany({
       where: {
         ...(query.category ? { categoryId: Number(query.category) } : null),
+        ...(query.userId ? { userId: Number(query.userId) } : null),
       },
       ...(query.include
         ? {
@@ -24,7 +25,6 @@ export const getListings = async (req: Request, res: Response) => {
     });
     res.status(200).json({ listings });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -32,4 +32,5 @@ export const getListings = async (req: Request, res: Response) => {
 export const getListingsQuerySchema = z.object({
   include: z.array(z.enum(["user", "images", "category"])).optional(),
   category: z.string().optional(),
+  userId: z.string().optional(),
 });
