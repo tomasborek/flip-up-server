@@ -14,6 +14,14 @@ import { deleteAvatar } from "./controllers/deleteAvatar";
 import { followUser } from "./controllers/followUser";
 import { unprotectedRoute } from "@middlewares/unprotectedRoute";
 import { unfollowUser } from "./controllers/unfollowUser";
+import {
+  getFollowers,
+  getFollowersQuerySchema,
+} from "./controllers/getFollowers";
+import {
+  getFollowing,
+  getFollowingQuerySchema,
+} from "./controllers/getFollowing";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -22,6 +30,18 @@ router.post("/", checkData(userSchema), createUser);
 router.get("/", checkQuery(getUsersQuerySchema), unprotectedRoute, getUsers);
 router.get("/me", protectedRoute, getMe);
 router.get("/:userId", getUser);
+router.get(
+  "/:userId/follower",
+  unprotectedRoute,
+  checkQuery(getFollowersQuerySchema),
+  getFollowers
+);
+router.get(
+  "/:userId/following",
+  unprotectedRoute,
+  checkQuery(getFollowingQuerySchema),
+  getFollowing
+);
 
 router.use(protectedRoute);
 router.post("/:userId/avatar", upload.single("avatar"), addAvatar);
