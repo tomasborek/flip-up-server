@@ -28,6 +28,8 @@ model User {
   following User[] @relation("Following")
   followers User[] @relation("Following")
   likedListings Listing[] @relation("Liked")
+  chats Chat[] @relation("ChatUsers")
+  messages Message[]
 }
 
 model Social {
@@ -59,6 +61,8 @@ model Listing{
   category  Category @relation(fields: [categoryId], references: [id])
   categoryId Int
   likedBy     User[] @relation("Liked")
+  sentIn Message[] @relation("SentListing")
+  referencedIn Message[]
 }
 
 model Image{
@@ -78,6 +82,28 @@ model Category{
   applicable Boolean @default(false)
   icon String?
   core Boolean @default(false)
+}
+
+model Chat{
+  id        Int      @id @default(autoincrement())
+  messages Message[]
+  updatedAt DateTime @updatedAt
+  users User[] @relation("ChatUsers")
+}
+
+model Message{
+  id        Int      @id @default(autoincrement())
+  text String?
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  createdAt DateTime @default(now())
+  image String?
+  listings Listing[] @relation("SentListing")
+  read Boolean @default(false)
+  referencedListing Listing? @relation(fields: [referencedListingId], references: [id])
+  referencedListingId Int?
 }
 
 

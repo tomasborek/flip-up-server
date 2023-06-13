@@ -42,6 +42,7 @@ export const getListing = async (req: Request, res: Response) => {
     const listingWithAdditionalData = {
       ...listing,
       liked: liked.length > 0,
+      owned: req.user ? listing.user.id === req.user.id : false,
     };
     res.status(200).json({ listing: listingWithAdditionalData });
   } catch (error) {
