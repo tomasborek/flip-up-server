@@ -6,10 +6,70 @@ type QueryData = z.infer<typeof getListingsQuerySchema>;
 export const getListings = async (req: Request, res: Response) => {
   const query = req.query as QueryData;
 
+  if (query.byFollowed && !req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
+    if (query.category) {
+      const category = await prisma.category.findUnique({
+        where: { id: Number(query.category) },
+      });
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    }
     const listings = await prisma.listing.findMany({
+      take: query.limit ? Number(query.limit) : 20,
       where: {
-        ...(query.category ? { categoryId: Number(query.category) } : null),
+        ...(query.byFollowed
+          ? {
+              userId: {
+                in: (
+                  await prisma.user.findUnique({
+                    where: { id: req.user?.id },
+                    select: { following: true },
+                  })
+                )?.following.map((f) => f.id),
+              },
+            }
+          : {}),
+        ...(query.category
+          ? {
+              category: {
+                OR: [
+                  {
+                    id: Number(query.category),
+                  },
+                  {
+                    parentCategories: { some: { id: Number(query.category) } },
+                  },
+                  {
+                    parentCategories: {
+                      some: {
+                        parentCategories: {
+                          some: { id: Number(query.category) },
+                        },
+                      },
+                    },
+                  },
+                  {
+                    parentCategories: {
+                      some: {
+                        parentCategories: {
+                          some: {
+                            parentCategories: {
+                              some: { id: Number(query.category) },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            }
+          : null),
         ...(query.userId ? { userId: Number(query.userId) } : null),
         ...(query.likedBy
           ? { likedBy: { some: { id: Number(query.likedBy) } } }
@@ -39,15 +99,17 @@ export const getListings = async (req: Request, res: Response) => {
     });
     const listingsWithAdditionalData = await Promise.all(
       listings.map(async (listing) => {
-        let likedBy = [];
-        if (req.user) {
-          likedBy = await prisma.listing.findMany({
-            where: { id: listing.id, likedBy: { some: { id: req.user.id } } },
-          });
-        }
         return {
           ...listing,
-          liked: likedBy.length > 0,
+          liked:
+            (
+              await prisma.listing.findMany({
+                where: {
+                  id: listing.id,
+                  likedBy: { some: { id: req.user.id } },
+                },
+              })
+            ).length > 0,
         };
       })
     );
@@ -62,4 +124,6 @@ export const getListingsQuerySchema = z.object({
   category: z.string().optional(),
   userId: z.string().optional(),
   likedBy: z.string().optional(),
+  limit: z.string().optional(),
+  byFollowed: z.string().optional(),
 });
