@@ -1,3 +1,6 @@
 node_modules
 # Keep environment variables out of version control
 .env
+#keep uploads folder content out of version control
+/uploads/avatars/*
+/uploads/listings/*
