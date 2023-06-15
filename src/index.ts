@@ -27,6 +27,6 @@ app.use("/listing", ListingRouter);
 app.use("/uploads", UploadRouter);
 app.use("/chat", ChatRouter);
 
-app.listen(process.env.SERVER_PORT, () => {
-  console.log(`⚡ Server running on port ${process.env.SERVER_PORT}`);
+app.listen(Number(process.env.SERVER_PORT) || 8080, "0.0.0.0", () => {
+  console.log(`⚡ Server running on port ${process.env.SERVER_PORT || 8080}`);
 });
