@@ -55,12 +55,12 @@ const writeImage = async (file: Express.Multer.File, fileName: string) => {
           data: {
             images: {
               create: {
-                url: `http://localhost:3001/uploads/listings/${fileName}`,
+                url: `${process.env.ROOT_URL}/uploads/listings/${fileName}`,
               },
             },
           },
         });
-        resolve(`http://localhost:3001/uploads/listings/${fileName}`);
+        resolve(`${process.env.ROOT_URL}/uploads/listings/${fileName}`);
       } catch (error) {
         reject(error);
       }

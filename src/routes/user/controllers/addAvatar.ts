@@ -38,7 +38,7 @@ export const addAvatar = async (req: Request, res: Response) => {
       await prisma.user.update({
         where: { id: user.id },
         data: {
-          avatar: `http://localhost:3001/uploads/avatars/${fileName}`,
+          avatar: `${process.env.ROOT_URL}/uploads/avatars/${fileName}`,
         },
       });
       return res.status(200).json({ message: "Avatar added" });
