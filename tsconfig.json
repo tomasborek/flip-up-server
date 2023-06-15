@@ -20,7 +20,8 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./types"],
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "outDir": "dist"
   },
   "include": ["src/**/*"]
 }
