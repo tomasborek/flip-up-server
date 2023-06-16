@@ -11,6 +11,16 @@ export const getUsers = async (req: Request, res: Response) => {
       where: {
         ...(query.username ? { username: query.username } : {}),
       },
+      take: query.limit ? Number(query.limit) : 10,
+      orderBy: {
+        ...(query.orderBy === "followers"
+          ? {
+              followers: {
+                _count: "desc",
+              },
+            }
+          : {}),
+      },
       include: {
         _count: {
           select: {
@@ -73,4 +83,6 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const getUsersQuerySchema = z.object({
   username: z.string().trim().max(255).optional(),
+  orderBy: z.enum(["followers"]).optional(),
+  limit: z.string().optional(),
 });
