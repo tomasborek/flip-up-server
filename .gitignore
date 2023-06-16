@@ -4,6 +4,7 @@ node_modules
 #keep uploads folder content out of version control
 /uploads/avatars/*
 /uploads/listings/*
+/uploads/messages/*
 
 dist
 
