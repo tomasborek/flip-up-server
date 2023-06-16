@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import fs from "fs";
+import path from "path";
 
 export const deleteListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
@@ -15,7 +16,9 @@ export const deleteListing = async (req: Request, res: Response) => {
       return res.status(403).send({ message: "Forbidden" });
     if (listing.images) {
       listing.images.forEach((image) => {
-        fs.unlinkSync(image.url.split("/").slice(-1)[0]);
+        fs.unlinkSync(
+          path.join("uploads", "listings", image.url.split("/").slice(-1)[0])
+        );
       });
     }
     await prisma.listing.delete({

@@ -15,7 +15,7 @@ import UploadRouter from "@routes/uploads";
 import ChatRouter from "@routes/chat";
 
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "*" }));
+app.use(cors({ origin: "*" }));
 app.use(cookieParser());
 
 app.use("/auth", AuthRouter);
@@ -27,6 +27,13 @@ app.use("/listing", ListingRouter);
 app.use("/uploads", UploadRouter);
 app.use("/chat", ChatRouter);
 
-app.listen(Number(process.env.SERVER_PORT) || 8080, "0.0.0.0", () => {
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "404 Not Found",
+  });
+});
+
+app.listen(8080, "::", () => {
   console.log(`⚡ Server running on port ${process.env.SERVER_PORT || 8080}`);
 });
