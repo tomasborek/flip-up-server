@@ -27,7 +27,7 @@ export const getListings = async (req: Request, res: Response) => {
               userId: {
                 in: (
                   await prisma.user.findUnique({
-                    where: { id: req.user?.id },
+                    where: { id: req.user.id },
                     select: { following: true },
                   })
                 )?.following.map((f) => f.id),
@@ -101,15 +101,16 @@ export const getListings = async (req: Request, res: Response) => {
       listings.map(async (listing) => {
         return {
           ...listing,
-          liked:
-            (
-              await prisma.listing.findMany({
-                where: {
-                  id: listing.id,
-                  likedBy: { some: { id: req.user.id } },
-                },
-              })
-            ).length > 0,
+          liked: req.user
+            ? (
+                await prisma.listing.findMany({
+                  where: {
+                    id: listing.id,
+                    likedBy: { some: { id: req.user?.id } },
+                  },
+                })
+              ).length > 0
+            : false,
         };
       })
     );
