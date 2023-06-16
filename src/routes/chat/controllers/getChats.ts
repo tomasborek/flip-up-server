@@ -1,12 +1,15 @@
 import { prisma } from "@db/prisma";
 import type { Request, Response } from "express";
+import { isChatRead } from "src/common/services/isChatRead";
 import { z } from "zod";
 type QueryData = z.infer<typeof getChatsQuerySchema>;
 export const getChats = async (req: Request, res: Response) => {
   const query = req.query as QueryData;
+  //cant fetch other users chats
   if (query.userId && req.user.id !== Number(query.userId)) {
     return res.status(403).json({ message: "Forbidden" });
   }
+  //cant fetch all chats (unless admin)
   if (!query.userId && !req.user.admin) {
     return res.status(403).json({ message: "Forbidden" });
   }
@@ -33,27 +36,32 @@ export const getChats = async (req: Request, res: Response) => {
         },
         updatedAt: true,
         messages: {
+          //take only latest message
           take: 1,
           orderBy: { createdAt: "desc" },
         },
       },
       orderBy: { updatedAt: "desc" },
     });
-    const chatsWithOtherUserOnly = chats.map((chat) => {
-      const otherUser = chat.users[0];
-      return {
-        id: chat.id,
-        user: {
-          id: otherUser.id,
-          username: otherUser.username,
-          avatar: otherUser.avatar,
-        },
-        lastMessage: chat.messages[0],
-        updatedAt: chat.updatedAt,
-      };
-    });
+    const chatsWithAdditionalData = await Promise.all(
+      chats.map(async (chat) => {
+        const otherUser = chat.users[0];
+        const read = await isChatRead(chat.id, otherUser.id);
+        return {
+          id: chat.id,
+          user: {
+            id: otherUser.id,
+            username: otherUser.username,
+            avatar: otherUser.avatar,
+          },
+          isUnread: !read,
+          lastMessage: chat.messages[0],
+          updatedAt: chat.updatedAt,
+        };
+      })
+    );
 
-    return res.status(200).json({ chats: chatsWithOtherUserOnly });
+    return res.status(200).json({ chats: chatsWithAdditionalData });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
