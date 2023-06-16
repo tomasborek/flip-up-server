@@ -1,5 +1,5 @@
 import { prisma } from "@db/prisma";
-export const sendMessage = ({
+export const sendMessage = async ({
   userId,
   chatId,
   text,
@@ -12,7 +12,7 @@ export const sendMessage = ({
   listingIds?: number[];
   referencedListingId?: number;
 }) => {
-  return prisma.chat.update({
+  await prisma.chat.update({
     where: { id: chatId },
     data: {
       updatedAt: new Date(),
@@ -47,5 +47,9 @@ export const sendMessage = ({
         },
       },
     },
+  });
+  return await prisma.message.findFirst({
+    where: { chatId },
+    orderBy: { createdAt: "desc" },
   });
 };

@@ -12,6 +12,7 @@ export const createChat = async (req: Request, res: Response) => {
       .status(400)
       .send({ message: "You can't send a message to yourself" });
   try {
+    let message;
     const existingChat = await prisma.chat.findFirst({
       where: {
         users: {
@@ -24,7 +25,7 @@ export const createChat = async (req: Request, res: Response) => {
       },
     });
     if (existingChat) {
-      await sendMessage({
+      message = await sendMessage({
         userId: req.user.id,
         chatId: existingChat.id,
         text: body.text,
@@ -39,7 +40,7 @@ export const createChat = async (req: Request, res: Response) => {
           },
         },
       });
-      await sendMessage({
+      message = await sendMessage({
         userId: req.user.id,
         chatId: chat.id,
         text: body.text,
@@ -47,7 +48,7 @@ export const createChat = async (req: Request, res: Response) => {
         referencedListingId: body.referencedListingId,
       });
     }
-    return res.status(201).send(null);
+    return res.status(201).send({ message });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: "Internal server error" });

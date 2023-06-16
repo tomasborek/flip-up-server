@@ -13,6 +13,7 @@ import CategoryRouter from "@routes/category";
 import ListingRouter from "@routes/listing";
 import UploadRouter from "@routes/uploads";
 import ChatRouter from "@routes/chat";
+import MessageRouter from "@routes/message";
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
@@ -26,6 +27,7 @@ app.use("/category", CategoryRouter);
 app.use("/listing", ListingRouter);
 app.use("/uploads", UploadRouter);
 app.use("/chat", ChatRouter);
+app.use("/message", MessageRouter);
 
 app.use((req, res) => {
   res.status(404).json({
