@@ -2,9 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import https from "https";
-import http from "http";
-import fs from "fs";
 const app = express();
 dotenv.config();
 //routers
@@ -39,18 +36,6 @@ app.use((req, res) => {
   });
 });
 
-const httpServer = http.createServer(app);
-const httpsServer = https.createServer(
-  {
-    key: fs.readFileSync("/etc/letsencrypt/live/my_api_url/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/my_api_url/fullchain.pem"),
-  },
-  app
-);
-
-httpServer.listen(80, () => {
-  console.log("⚡ HTTP Server running on port 80");
-});
-httpsServer.listen(443, () => {
-  console.log("⚡ HTTPS Server running on port 443");
+app.listen(process.env.PORT || 8080, () => {
+  console.log("Server is running on port 8080");
 });
