@@ -7,7 +7,7 @@ export const getListings = async (req: Request, res: Response) => {
   const query = req.query as QueryData;
 
   if (query.byFollowed && !req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(200).json({ listings: [] });
   }
 
   try {
