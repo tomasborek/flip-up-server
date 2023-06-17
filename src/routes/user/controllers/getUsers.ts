@@ -13,6 +13,7 @@ export const getUsers = async (req: Request, res: Response) => {
       },
       take: query.limit ? Number(query.limit) : 10,
       orderBy: {
+        createdAt: "asc",
         ...(query.orderBy === "followers"
           ? {
               followers: {
