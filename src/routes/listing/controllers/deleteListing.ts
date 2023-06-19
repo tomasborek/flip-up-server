@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
-import fs from "fs";
 import path from "path";
 import { deleteImage } from "src/common/services/deleteImage";
 
@@ -15,6 +14,7 @@ export const deleteListing = async (req: Request, res: Response) => {
     if (!listing) return res.status(404).send({ message: "Listing not found" });
     if (req.user!.id !== listing.userId)
       return res.status(403).send({ message: "Forbidden" });
+
     if (listing.images) {
       listing.images.forEach((image) => {
         deleteImage(

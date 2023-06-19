@@ -5,10 +5,6 @@ import {
   getCategories,
   getCategoriesQuerySchema,
 } from "./controllers/getCategories";
-import {
-  createCategories,
-  createCategoriesSchema,
-} from "./controllers/createCategories";
 import { checkData } from "@middlewares/checkData";
 import { deleteCategory } from "./controllers/deleteCategory";
 import { createCategory, categorySchema } from "./controllers/createCategory";
