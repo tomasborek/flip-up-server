@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import fs from "fs";
 import path from "path";
+import { deleteImage } from "src/common/services/deleteImage";
 
 export const deleteListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
@@ -16,8 +17,12 @@ export const deleteListing = async (req: Request, res: Response) => {
       return res.status(403).send({ message: "Forbidden" });
     if (listing.images) {
       listing.images.forEach((image) => {
-        fs.unlinkSync(
-          path.join("uploads", "listings", image.url.split("/").slice(-1)[0])
+        deleteImage(
+          path.join(
+            "uploads",
+            "listings",
+            image.url.split("/")[image.url.split("/").length - 1]
+          )
         );
       });
     }

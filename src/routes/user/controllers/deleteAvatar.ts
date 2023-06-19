@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import fs from "fs";
+import { deleteImage } from "src/common/services/deleteImage";
+import path from "path";
 export const deleteAvatar = async (req: Request, res: Response) => {
   const { userId } = req.params;
   try {
@@ -16,6 +18,13 @@ export const deleteAvatar = async (req: Request, res: Response) => {
       where: { id: req.user!.id },
       data: { avatar: null },
     });
+    await deleteImage(
+      path.join(
+        "uploads",
+        "avatars",
+        user.avatar.split("/")[user.avatar.split("/").length - 1]
+      )
+    );
     res.status(200).json({ message: "Avatar deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
