@@ -6,6 +6,9 @@ import sharp from "sharp";
 
 export const addAvatar = async (req: Request, res: Response) => {
   if (!req.file) return res.status(400).json({ message: "No file provided" });
+  if (!req.file.mimetype.startsWith("image"))
+    return res.status(400).json({ message: "Invalid file type" });
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: Number(req.params.userId) },

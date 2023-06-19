@@ -10,6 +10,9 @@ export const addImages = async (req: Request, res: Response) => {
 
   if (!images || !images.length)
     return res.status(400).json({ error: "No images provided" });
+  //@ts-ignore
+  const nonImage = images.find((image) => !image.mimetype.startsWith("image"));
+  if (nonImage) return res.status(400).json({ error: "Invalid file type" });
 
   try {
     const listing = await prisma.listing.findUnique({

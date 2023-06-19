@@ -35,6 +35,10 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const userSchema = z.object({
   email: z.string().email().max(255),
-  username: z.string().min(3).max(255),
+  username: z
+    .string()
+    .min(3)
+    .max(255)
+    .regex(/^[a-zA-Z0-9]+$/),
   password: z.string().min(8).max(65),
 });
