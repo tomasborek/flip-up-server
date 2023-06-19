@@ -14,6 +14,7 @@ import { deleteAvatar } from "./controllers/deleteAvatar";
 import { followUser } from "./controllers/followUser";
 import { unprotectedRoute } from "@middlewares/unprotectedRoute";
 import { unfollowUser } from "./controllers/unfollowUser";
+import { createSocial, socialSchema } from "./controllers/createSocial";
 import {
   getFollowers,
   getFollowersQuerySchema,
@@ -44,6 +45,7 @@ router.get(
 );
 
 router.use(protectedRoute);
+router.post("/:userId/social", checkData(socialSchema), createSocial);
 router.post("/:userId/avatar", upload.single("avatar"), addAvatar);
 router.delete("/:userId/avatar", deleteAvatar);
 router.patch("/:userId", checkData(updateUserSchema), updateUser);

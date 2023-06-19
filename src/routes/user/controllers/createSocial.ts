@@ -8,7 +8,7 @@ export const createSocial = async (req: Request, res: Response) => {
   try {
     const body: Data = req.body;
     const user = await prisma.user.findUnique({
-      where: { id: Number(body.userId) },
+      where: { id: Number(req.params.userId) },
       include: { socials: true },
     });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -36,5 +36,4 @@ export const createSocial = async (req: Request, res: Response) => {
 export const socialSchema = z.object({
   name: z.union([z.literal("instagram"), z.literal("facebook")]),
   url: z.string().trim().min(3).max(255).url(),
-  userId: z.number(),
 });
