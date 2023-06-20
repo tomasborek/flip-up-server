@@ -1,10 +1,14 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import { z } from "zod";
+import { isLiked } from "src/common/services/listing/isLiked";
 type QueryData = z.infer<typeof getListingsQuerySchema>;
 
 export const getListings = async (req: Request, res: Response) => {
   const query = req.query as QueryData;
+
+  if (query.userId && query.byFollowed)
+    return res.status(400).json({ message: "Invalid query" });
 
   if (query.byFollowed && !req.user) {
     return res.status(200).json({ listings: [] });
@@ -19,61 +23,34 @@ export const getListings = async (req: Request, res: Response) => {
         return res.status(404).json({ message: "Category not found" });
       }
     }
+
     const listings = await prisma.listing.findMany({
       take: query.limit ? Number(query.limit) : 20,
+      orderBy: { createdAt: "desc" },
       where: {
-        ...(query.byFollowed
+        userId: query.byFollowed
           ? {
-              userId: {
-                in: (
-                  await prisma.user.findUnique({
-                    where: { id: req.user.id },
-                    select: { following: true },
-                  })
-                )?.following.map((f) => f.id),
-              },
+              in: (
+                await prisma.user.findUnique({
+                  where: { id: req.user.id },
+                  select: { following: true },
+                })
+              )?.following.map((f) => f.id),
             }
-          : {}),
-        ...(query.category
+          : query.userId
+          ? Number(query.userId)
+          : undefined,
+        likedBy: query.likedBy
+          ? { some: { id: Number(query.likedBy) } }
+          : undefined,
+        category: query.category
           ? {
-              category: {
-                OR: [
-                  {
-                    id: Number(query.category),
-                  },
-                  {
-                    parentCategories: { some: { id: Number(query.category) } },
-                  },
-                  {
-                    parentCategories: {
-                      some: {
-                        parentCategories: {
-                          some: { id: Number(query.category) },
-                        },
-                      },
-                    },
-                  },
-                  {
-                    parentCategories: {
-                      some: {
-                        parentCategories: {
-                          some: {
-                            parentCategories: {
-                              some: { id: Number(query.category) },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
+              OR: [
+                { id: Number(query.category) },
+                { parentCategories: { some: { id: Number(query.category) } } },
+              ],
             }
-          : null),
-        ...(query.userId ? { userId: Number(query.userId) } : null),
-        ...(query.likedBy
-          ? { likedBy: { some: { id: Number(query.likedBy) } } }
-          : null),
+          : undefined,
       },
       include: {
         user: query.include?.includes("user")
@@ -95,22 +72,12 @@ export const getListings = async (req: Request, res: Response) => {
           select: { likedBy: true },
         },
       },
-      orderBy: { createdAt: "desc" },
     });
     const listingsWithAdditionalData = await Promise.all(
       listings.map(async (listing) => {
         return {
           ...listing,
-          liked: req.user
-            ? (
-                await prisma.listing.findMany({
-                  where: {
-                    id: listing.id,
-                    likedBy: { some: { id: req.user?.id } },
-                  },
-                })
-              ).length > 0
-            : false,
+          liked: await isLiked(req.user?.id, listing.id),
         };
       })
     );

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import { z } from "zod";
-import { sendMessage } from "src/common/services/sendMessage";
+import { sendMessage } from "src/common/services/message/sendMessage";
 
 type Data = z.infer<typeof chatSchema>;
 

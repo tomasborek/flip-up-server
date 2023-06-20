@@ -1,6 +1,6 @@
 import { prisma } from "@db/prisma";
 import type { Request, Response } from "express";
-import { isChatRead } from "src/common/services/isChatRead";
+import { isChatRead } from "src/common/services/chat/isChatRead";
 import { z } from "zod";
 type QueryData = z.infer<typeof getChatsQuerySchema>;
 export const getChats = async (req: Request, res: Response) => {

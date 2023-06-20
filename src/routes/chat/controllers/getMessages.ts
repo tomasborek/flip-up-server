@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import { z } from "zod";
-import { readAllMessages } from "src/common/services/readAllMessages";
+import { readAllMessages } from "src/common/services/message/readAllMessages";
 
 type QueryData = z.infer<typeof getMessagesQuerySchema>;
 

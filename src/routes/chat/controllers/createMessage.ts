@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { sendMessage } from "src/common/services/sendMessage";
+import { sendMessage } from "src/common/services/message/sendMessage";
 
 type Data = z.infer<typeof messageSchema>;
 

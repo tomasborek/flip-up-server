@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
+import { isLiked } from "src/common/services/listing/isLiked";
 
 export const getListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
@@ -26,23 +27,12 @@ export const getListing = async (req: Request, res: Response) => {
       },
     });
     if (!listing) return res.status(404).json({ message: "Listing not found" });
-    let liked = [];
-    if (req.user) {
-      liked = await prisma.listing.findMany({
-        where: {
-          id: Number(listingId),
-          likedBy: {
-            some: {
-              id: req.user.id,
-            },
-          },
-        },
-      });
-    }
+    const liked = isLiked(req.user?.id, listing.id);
+
     const listingWithAdditionalData = {
       ...listing,
-      liked: liked.length > 0,
-      owned: req.user ? listing.user.id === req.user.id : false,
+      liked,
+      owned: listing.user.id === Number(req.user?.id),
     };
     res.status(200).json({ listing: listingWithAdditionalData });
   } catch (error) {
