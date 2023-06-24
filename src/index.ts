@@ -17,7 +17,11 @@ import UploadRouter from "@routes/uploads";
 import ChatRouter from "@routes/chat";
 import MessageRouter from "@routes/message";
 
-const allowlist = ["https://flipup.cz", "http://localhost:3000"];
+const allowlist = [
+  "https://flipup.cz",
+  "https://www.flipup.cz",
+  "http://localhost:3000",
+];
 const corsOptionsDelegate = function (req: Request, callback: any) {
   let corsOptions;
   if (allowlist.includes(req.header("Origin") || "")) {
