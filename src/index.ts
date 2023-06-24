@@ -17,9 +17,9 @@ import UploadRouter from "@routes/uploads";
 import ChatRouter from "@routes/chat";
 import MessageRouter from "@routes/message";
 
-var allowlist = ["https://flipup.cz", "http://localhost:3000"];
+const allowlist = ["https://flipup.cz", "http://localhost:3000"];
 const corsOptionsDelegate = function (req: Request, callback: any) {
-  var corsOptions;
+  let corsOptions;
   if (allowlist.includes(req.header("Origin") || "")) {
     corsOptions = { origin: true };
   } else {
@@ -27,11 +27,10 @@ const corsOptionsDelegate = function (req: Request, callback: any) {
   }
   callback(null, corsOptions);
 };
-
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json());
 app.use(cors(corsOptionsDelegate));
 app.use(cookieParser());
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 app.use("/auth", AuthRouter);
 app.use("/user", UserRouter);
