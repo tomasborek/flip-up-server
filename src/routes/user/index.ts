@@ -16,6 +16,10 @@ import { unprotectedRoute } from "@middlewares/unprotectedRoute";
 import { unfollowUser } from "./controllers/unfollowUser";
 import { createSocial, socialSchema } from "./controllers/createSocial";
 import {
+  updateInterests,
+  updateInterestsSchema,
+} from "./controllers/updateInterests";
+import {
   getFollowers,
   getFollowersQuerySchema,
 } from "./controllers/getFollowers";
@@ -51,5 +55,10 @@ router.delete("/:userId/avatar", deleteAvatar);
 router.patch("/:userId", checkData(updateUserSchema), updateUser);
 router.post("/:userId/follower", followUser);
 router.delete("/:userId/follower", unfollowUser);
+router.post(
+  "/:userId/interest",
+  checkData(updateInterestsSchema),
+  updateInterests
+);
 
 export default router;

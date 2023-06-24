@@ -1,3 +1,4 @@
+// GET /chat/:chatId/message - #protected
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 import { z } from "zod";
@@ -6,11 +7,11 @@ import { readAllMessages } from "src/common/services/message/readAllMessages";
 type QueryData = z.infer<typeof getMessagesQuerySchema>;
 
 export const getMessages = async (req: Request, res: Response) => {
-  const { chatId } = req.params;
+  const params = req.params;
   const query: QueryData = req.query;
   try {
     const chat = await prisma.chat.findFirst({
-      where: { id: Number(chatId) },
+      where: { id: Number(params.chatId) },
       include: {
         users: true,
         messages: {
@@ -44,11 +45,11 @@ export const getMessages = async (req: Request, res: Response) => {
       },
     });
     if (!chat) return res.status(401).send({ message: "Chat not found" });
-    if (!chat.users.map((u) => u.id).includes(req.user.id)) {
+    if (!chat.users.map((u) => u.id).includes(req.user!.id)) {
       //dont allow user to read messages if they are not part of the chat
       return res.status(403).send({ messages: "Forbidden" });
     }
-    const senderId = chat.users.find((u) => u.id !== req.user.id)?.id;
+    const senderId = chat.users.find((u) => u.id !== req.user!.id)?.id;
     if (!senderId)
       return res.status(500).send({ message: "Internal server error" });
     await readAllMessages(chat.id, senderId);

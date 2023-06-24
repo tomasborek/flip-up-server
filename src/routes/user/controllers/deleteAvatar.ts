@@ -10,7 +10,7 @@ export const deleteAvatar = async (req: Request, res: Response) => {
       where: { id: Number(userId) },
     });
     if (!user) return res.status(404).json({ message: "User not found" });
-    if (req.user.id !== user.id)
+    if (req.user!.id !== user.id)
       return res.status(403).json({ message: "Forbidden" });
     if (!user.avatar)
       return res.status(404).json({ message: "Avatar not found" });

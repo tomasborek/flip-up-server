@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { Request } from "express";
 const app = express();
 dotenv.config();
 //routers
@@ -15,9 +17,21 @@ import UploadRouter from "@routes/uploads";
 import ChatRouter from "@routes/chat";
 import MessageRouter from "@routes/message";
 
+var allowlist = ["https://flipup.cz", "http://localhost:3000"];
+const corsOptionsDelegate = function (req: Request, callback: any) {
+  var corsOptions;
+  if (allowlist.includes(req.header("Origin") || "")) {
+    corsOptions = { origin: true };
+  } else {
+    corsOptions = { origin: false };
+  }
+  callback(null, corsOptions);
+};
+
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors(corsOptionsDelegate));
 app.use(cookieParser());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 app.use("/auth", AuthRouter);
 app.use("/user", UserRouter);

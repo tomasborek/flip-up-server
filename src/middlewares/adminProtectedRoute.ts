@@ -6,7 +6,7 @@ const adminProtectedRouteMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user.admin) {
+  if (!req.user?.admin) {
     res.status(403).json({ message: "Forbidden" });
   }
   next();

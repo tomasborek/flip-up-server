@@ -1,16 +1,16 @@
+// GET /chat?userId=1 - #protected
 import { prisma } from "@db/prisma";
 import type { Request, Response } from "express";
 import { isChatRead } from "src/common/services/chat/isChatRead";
 import { z } from "zod";
 type QueryData = z.infer<typeof getChatsQuerySchema>;
+
 export const getChats = async (req: Request, res: Response) => {
   const query = req.query as QueryData;
-  //cant fetch other users chats
-  if (query.userId && req.user.id !== Number(query.userId)) {
+  if (query.userId && req.user!.id !== Number(query.userId)) {
     return res.status(403).json({ message: "Forbidden" });
   }
-  //cant fetch all chats (unless admin)
-  if (!query.userId && !req.user.admin) {
+  if (!query.userId && !req.user!.admin) {
     return res.status(403).json({ message: "Forbidden" });
   }
   try {
@@ -23,11 +23,7 @@ export const getChats = async (req: Request, res: Response) => {
       select: {
         id: true,
         users: {
-          where: {
-            id: {
-              not: req.user.id,
-            },
-          },
+          where: { id: { not: req.user!.id } },
           select: {
             id: true,
             username: true,
@@ -36,14 +32,13 @@ export const getChats = async (req: Request, res: Response) => {
         },
         updatedAt: true,
         messages: {
-          //take only latest message
           take: 1,
           orderBy: { createdAt: "desc" },
         },
       },
       orderBy: { updatedAt: "desc" },
     });
-    const chatsWithAdditionalData = await Promise.all(
+    const responseChats = await Promise.all(
       chats.map(async (chat) => {
         const otherUser = chat.users[0];
         const read = await isChatRead(chat.id, otherUser.id);
@@ -61,7 +56,7 @@ export const getChats = async (req: Request, res: Response) => {
       })
     );
 
-    return res.status(200).json({ chats: chatsWithAdditionalData });
+    return res.status(200).json({ chats: responseChats });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });

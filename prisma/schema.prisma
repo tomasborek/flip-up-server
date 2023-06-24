@@ -25,6 +25,7 @@ model User {
   socials  Social[]
   ratings  Rating[]
   listings Listing[]
+  interests Category[]
   following User[] @relation("Following")
   followers User[] @relation("Following")
   likedListings Listing[] @relation("Liked")
@@ -82,6 +83,7 @@ model Category{
   applicable Boolean @default(false)
   icon String?
   core Boolean @default(false)
+  interestedBy User[]
 }
 
 model Chat{

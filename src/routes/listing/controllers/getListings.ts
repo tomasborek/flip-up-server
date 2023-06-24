@@ -32,7 +32,7 @@ export const getListings = async (req: Request, res: Response) => {
           ? {
               in: (
                 await prisma.user.findUnique({
-                  where: { id: req.user.id },
+                  where: { id: req.user!.id },
                   select: { following: true },
                 })
               )?.following.map((f) => f.id),

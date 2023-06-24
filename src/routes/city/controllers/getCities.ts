@@ -633,7 +633,6 @@ const cities = [
   "Potstejn",
   "Prachatice",
   "Prackovice nad Labem",
-  "Prague",
   "Prazmo",
   "Preckov",
   "Predklasteri",

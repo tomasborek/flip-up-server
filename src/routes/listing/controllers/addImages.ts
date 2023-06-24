@@ -21,7 +21,7 @@ export const addImages = async (req: Request, res: Response) => {
     });
     if (!listing) return res.status(404).json({ error: "Listing not found" });
 
-    if (req.user.id !== listing.userId)
+    if (req.user!.id !== listing.userId)
       return res.status(403).json({ error: "Forbidden" });
 
     //@ts-ignore

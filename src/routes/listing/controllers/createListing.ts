@@ -17,7 +17,7 @@ export const createListing = async (req: Request, res: Response) => {
         title: body.title,
         description: body.description || null,
         location: body.location,
-        user: { connect: { id: req.user.id } },
+        user: { connect: { id: req.user!.id } },
         category: { connect: { id: body.categoryId } },
       },
     });
@@ -31,5 +31,5 @@ export const listingSchema = z.object({
   title: z.string().trim().min(1).max(70),
   description: z.string().trim().max(1000).optional(),
   location: z.string().trim().max(255).min(1),
-  categoryId: z.number(),
+  categoryId: z.number().int().positive().finite(),
 });

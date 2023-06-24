@@ -1,11 +1,12 @@
+// GET /chat/:chatId - #protected
 import type { Request, Response } from "express";
 import { prisma } from "@db/prisma";
 
 export const getChat = async (req: Request, res: Response) => {
-  const { chatId } = req.params;
+  const params = req.params;
   try {
     const chat = await prisma.chat.findFirst({
-      where: { id: Number(chatId) },
+      where: { id: Number(params.chatId) },
       include: {
         users: {
           select: {
@@ -17,15 +18,15 @@ export const getChat = async (req: Request, res: Response) => {
         },
       },
     });
-    if (!chat?.users.map((u) => u.id).includes(req.user.id)) {
+    if (!chat?.users.map((u) => u.id).includes(req.user!.id)) {
       return res.status(403).send({ message: "Forbidden" });
     }
-    const chatWithoutMe = {
+    const responseChat = {
       ...chat,
-      user: chat.users.filter((user) => user.id !== req.user.id)[0],
+      user: chat.users.filter((user) => user.id !== req.user!.id)[0], //send only the other user
     };
 
-    return res.status(200).send({ chat: chatWithoutMe });
+    return res.status(200).send({ chat: responseChat });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: "Internal server error" });
