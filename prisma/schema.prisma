@@ -16,7 +16,7 @@ model User {
   phone     String?   @unique
   admin    Boolean  @default(false)
   username  String @unique
-  lastActive DateTime
+  lastActive DateTime @default(now())
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime? @updatedAt
@@ -35,10 +35,15 @@ model User {
 
 model Social {
   id        Int      @id @default(autoincrement())
-  name      String
+  type      SocialType
   url       String
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+}
+
+enum SocialType{
+  FACEBOOK
+  INSTAGRAM
 }
 
 model Rating {

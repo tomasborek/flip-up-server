@@ -1,19 +1,47 @@
-import type { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-export const protectedRoute = (
+import UserRepository from "@repositories/UserRepository";
+import { validateToken } from "@utils/jwt";
+import { Request, Response, NextFunction } from "express";
+import { response } from "@utils/response";
+
+export default async function auth(
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+) {
+  if (!req.headers.authorization?.includes("Bearer")) {
+    response({
+      res,
+      status: 401,
+      message: "Authorization header malformed",
+    });
+    return;
+  }
+
+  if (req.headers.authorization?.split(" ").length != 2) {
+    response({
+      res,
+      status: 401,
+      message: "Authorization header malformed",
+    });
+    return;
+  }
+
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+
+  const jwtPayload = validateToken(token);
+
+  if (!jwtPayload) {
+    response({ res, status: 401, message: "Invalid token" });
+    return;
   }
-  try {
-    const user = jwt.verify(token, process.env.JWT_SECRET || "");
-    req.user = user as any;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" });
+
+  const user = await UserRepository.findByEmail(jwtPayload.email);
+
+  if (!user) {
+    response({ res, status: 401, message: "Invalid token" });
+    return;
   }
-};
+
+  req.user = user;
+  next();
+}

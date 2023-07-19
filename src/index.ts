@@ -1,21 +1,23 @@
-import express from "express";
+import express, { Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { Request } from "express";
+import morgan from "morgan";
 const app = express();
 dotenv.config();
 //routers
-import UserRouter from "@routes/user";
-import AuthRouter from "@routes/auth";
-import SocialRouter from "@routes/social";
-import CityRouter from "@routes/city";
-import CategoryRouter from "@routes/category";
-import ListingRouter from "@routes/listing";
-import UploadRouter from "@routes/uploads";
-import ChatRouter from "@routes/chat";
-import MessageRouter from "@routes/message";
+import UserRouter from "@routes/UserRoute";
+import SocialRouter from "@routes/SocialRoute";
+import CityRouter from "@routes/CityRoute";
+import CategoryRouter from "@routes/CategoryRoute";
+import ListingRouter from "@routes/ListingRoute";
+import UploadRouter from "@routes/UploadRouter";
+import ChatRouter from "@routes/ChatRoute";
+import MessageRouter from "@routes/MessageRoute";
+import logger from "./utils/logger";
+import { response } from "@utils/response";
 
 const allowlist = [
   "https://flipup.cz",
@@ -35,8 +37,10 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json());
 app.use(cors(corsOptionsDelegate));
 app.use(cookieParser());
+app.use(
+  morgan(":method [:url] :status = :response-time ms - :res[content-length]")
+);
 
-app.use("/auth", AuthRouter);
 app.use("/user", UserRouter);
 app.use("/social", SocialRouter);
 app.use("/city", CityRouter);
@@ -46,13 +50,14 @@ app.use("/uploads", UploadRouter);
 app.use("/chat", ChatRouter);
 app.use("/message", MessageRouter);
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "404 Not Found",
+app.use((req: Request, res: Response) => {
+  response({
+    res,
+    status: 404,
+    message: "Not found",
   });
 });
 
 app.listen(process.env.PORT || 8080, () => {
-  console.log("Server is running on port 8080");
+  logger.info("Server is running on port 8080");
 });

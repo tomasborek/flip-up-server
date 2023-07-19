@@ -11,10 +11,15 @@
     "baseUrl": ".",
     "paths": {
       "@routes/*": ["src/routes/*"],
-      "@db/*": ["src/common/db/*"],
-      "@interfaces/*": ["src/common/interfaces/*"],
+      "@db/*": ["src/db/*"],
+      "@interfaces/*": ["src/interfaces/*"],
       "@middlewares/*": ["src/middlewares/*"],
-      "@lib/*": ["src/common/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@utils/*": ["src/utils/*"],
+      "@services/*": ["src/services/*"],
+      "@repositories/*": ["src/repositories/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@validators/*": ["src/validators/*"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { protectedRoute } from "./protectedRoute";
+import protectedRoute from "./protectedRoute";
 
 const adminProtectedRouteMiddleware = (
   req: Request,
