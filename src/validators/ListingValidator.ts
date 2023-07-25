@@ -15,9 +15,13 @@ const ListingValidator = {
     offset: z.string().optional(),
     byFollowed: z.string().optional(),
   }),
-  update: z.object({
-    image: z.string().url().optional(),
-  }),
+  update: z
+    .object({
+      title: z.string().max(255).trim().min(1).optional(),
+      description: z.string().max(1000).min(1).optional(),
+      categoryId: z.number().int().positive().finite().optional(),
+    })
+    .strict(),
 };
 export type ListingCreateType = z.infer<typeof ListingValidator.create>;
 export type ListingGetManyType = z.infer<typeof ListingValidator.getMany>;

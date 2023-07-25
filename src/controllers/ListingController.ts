@@ -52,6 +52,21 @@ const ListingController = {
       message: "Successfully deleted listing",
     });
   },
+  update: async (req: Request, res: Response) => {
+    const listing = await ListingRepository.findById(
+      Number(req.params.listingId)
+    );
+    if (!listing)
+      return response({ res, status: 404, message: "Listing not found" });
+    if (listing.userId !== Number(req.user!.id))
+      return response({ res, status: 403, message: "Forbidden" });
+    await ListingRepository.update(Number(req.params.listingId), req.body);
+    return response({
+      res,
+      status: 200,
+      message: "Successfully updated listing",
+    });
+  },
   getOne: async (req: Request, res: Response) => {
     const listing = await ListingRepository.findById(
       Number(req.params.listingId)
@@ -160,9 +175,21 @@ const ListingController = {
     );
     if (!listing)
       return response({ res, status: 404, message: "Listing not found" });
-
     if (req.user!.id !== listing.userId)
       return res.status(403).json({ error: "Forbidden" });
+    if (listing.images) {
+      await Promise.all(
+        listing.images.map((i) => {
+          return deleteImage(
+            path.join(
+              "uploads",
+              "listings",
+              i.url.split("/")[i.url.split("/").length - 1]
+            )
+          );
+        })
+      );
+    }
 
     //@ts-ignore
     const imagePromises = req.files.map(async (file: Express.Multer.File) => {
@@ -172,9 +199,10 @@ const ListingController = {
         path: path.join("uploads", "listings", fileName),
         buffer: resizedImageBuffer,
       });
-      await ListingRepository.update(Number(req.params.listingId), {
-        image: `${process.env.ROOT_URL}/uploads/listings/${fileName}`,
-      });
+      await ListingRepository.addImage(
+        Number(req.params.listingId),
+        `${process.env.ROOT_URL}/uploads/listings/${fileName}`
+      );
     });
     await Promise.all(imagePromises);
     return res.status(200).json(null);

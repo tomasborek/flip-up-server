@@ -15,9 +15,13 @@ const ListingRepository = {
   update: (listingId: number, data: ListingUpdateType) => {
     return prisma.listing.update({
       where: { id: listingId },
-      data: {
-        images: data.image ? { create: { url: data.image } } : undefined,
-      },
+      data,
+    });
+  },
+  addImage: (listingId: number, url: string) => {
+    return prisma.listing.update({
+      where: { id: listingId },
+      data: { images: { create: { url } } },
     });
   },
   findById: (id: number) => {
@@ -33,6 +37,7 @@ const ListingRepository = {
             username: true,
             email: true,
             lastActive: true,
+            avatar: true,
             _count: { select: { ratings: true } },
           },
         },

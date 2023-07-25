@@ -28,6 +28,11 @@ ListingRouter.post(
   validate(ListingValidator.create),
   controller(ListingController.create)
 );
+ListingRouter.patch(
+  "/:listingId",
+  validateQuery(ListingValidator.update),
+  controller(ListingController.update)
+);
 ListingRouter.post("/:listingId/likedBy", controller(ListingController.like));
 ListingRouter.delete(
   "/:listingId/likedBy",
