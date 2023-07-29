@@ -10,6 +10,9 @@ const UserRepository = {
   update: (id: number, data: UserUpdateType) => {
     return prisma.user.update({ where: { id }, data });
   },
+  delete: (id: number) => {
+    return prisma.user.delete({ where: { id } });
+  },
   findByEmail: (email: string) => {
     return prisma.user.findUnique({
       where: { email },

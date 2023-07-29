@@ -51,6 +51,7 @@ UserRouter.patch(
   validate(UserValidator.update),
   controller(UserController.update)
 );
+UserRouter.delete("/:userId", controller(UserController.delete));
 UserRouter.post(
   "/social",
   validate(SocialValidator.create),

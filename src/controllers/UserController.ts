@@ -74,6 +74,14 @@ const UserController = {
       message: "Successfully updated user",
     });
   },
+  delete: async (req: Request, res: Response) => {
+    const user = await UserRepository.findById(Number(req.params.userId));
+    if (!user) return response({ res, status: 404, message: "User not found" });
+    if (req.user?.id !== user.id)
+      return response({ res, status: 403, message: "Forbidden" });
+    await UserRepository.delete(user.id);
+    response({ res, status: 200, message: "User deleted succesfully" });
+  },
   getMe: async (req: Request, res: Response) => {
     const user = await UserRepository.findById(req.user!.id);
     if (!user) return response({ res, status: 404, message: "User not found" });
