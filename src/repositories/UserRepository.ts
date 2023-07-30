@@ -10,6 +10,9 @@ const UserRepository = {
   update: (id: number, data: UserUpdateType) => {
     return prisma.user.update({ where: { id }, data });
   },
+  updatePassword: (id: number, password: string) => {
+    return prisma.user.update({ where: { id }, data: { password } });
+  },
   delete: (id: number) => {
     return prisma.user.delete({ where: { id } });
   },

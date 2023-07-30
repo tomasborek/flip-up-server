@@ -19,6 +19,11 @@ const UserValidator = {
     lastActive: z.date().optional(),
     avatar: z.string().url().max(1000).optional().nullable(),
   }),
+  updatePassword: z
+    .object({
+      password: z.string().max(65).min(8),
+    })
+    .strict(),
   updateInterests: z
     .object({
       categoryIds: z.array(z.number().int().positive()),

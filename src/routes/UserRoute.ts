@@ -8,6 +8,7 @@ import validateQuery from "@middlewares/validateQuery";
 import SocialValidator from "@validators/SocialValidator";
 import multer from "multer";
 import { unprotectedRoute } from "@middlewares/unprotectedRoute";
+import UserRepository from "@repositories/UserRepository";
 const upload = multer({ storage: multer.memoryStorage() });
 
 const UserRouter = Router();
@@ -51,7 +52,12 @@ UserRouter.patch(
   validate(UserValidator.update),
   controller(UserController.update)
 );
-UserRouter.delete("/:userId", controller(UserController.delete));
+UserRouter.patch(
+  "/me/password",
+  validate(UserValidator.updatePassword),
+  controller(UserRepository.updatePassword)
+);
+UserRouter.delete("/me", controller(UserController.delete));
 UserRouter.post(
   "/social",
   validate(SocialValidator.create),

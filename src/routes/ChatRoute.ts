@@ -9,11 +9,6 @@ import { Router } from "express";
 const ChatRouter = Router();
 ChatRouter.use(protectedRoute);
 ChatRouter.post("/", controller(ChatController.create));
-ChatRouter.post(
-  "/:chatId",
-  validate(ChatValidator.create),
-  controller(ChatController.create)
-);
 ChatRouter.get("/:chatId", ChatController.getOne);
 ChatRouter.get(
   "/:chatId/message",
