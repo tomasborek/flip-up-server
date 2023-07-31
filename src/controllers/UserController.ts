@@ -328,6 +328,54 @@ const UserController = {
       },
     });
   },
+  createRating: async (req: Request, res: Response) => {
+    if (req.params.userId === req.user!.id.toString())
+      return response({ res, status: 400, message: "You can't rate yourself" });
+    const existingRating = await UserRepository.findRatingByAuthorId(
+      Number(req.params.userId),
+      req.user!.id
+    );
+    if (existingRating)
+      return response({
+        res,
+        status: 409,
+        message: "You have already rated this user",
+      });
+    await UserRepository.createRating(
+      req.user!.id,
+      Number(req.params.userId),
+      req.body
+    );
+    return response({
+      res,
+      status: 200,
+      message: "Successfully created rating",
+    });
+  },
+  getRatings: async (req: Request, res: Response) => {
+    const ratings = await UserRepository.getRatings(
+      Number(req.params.userId),
+      req.query
+    );
+    return response({
+      res,
+      status: 200,
+      message: "Successfully retrieved ratings",
+      data: {
+        ratings: ratings.map((r) => ({
+          id: r.id,
+          rating: r.rating,
+          comment: r.comment,
+          createdAt: r.createdAt,
+          author: {
+            id: r.author.id,
+            username: r.author.username,
+            avatar: r.author.avatar,
+          },
+        })),
+      },
+    });
+  },
 };
 
 export default UserController;

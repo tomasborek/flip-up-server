@@ -2,6 +2,7 @@ import { prisma } from "@db/prisma";
 import { Prisma } from "@prisma/client";
 import { UserCreateType, UserUpdateType } from "@validators/UserValidators";
 import ChatRepository from "./ChatRepository";
+import { RatingCreateType, RatingGetType } from "@validators/RatingValidator";
 
 const UserRepository = {
   create: (data: UserCreateType) => {
@@ -174,6 +175,30 @@ const UserRepository = {
   getChatId: async (reqUserId: number, userId: number) => {
     const chat = await ChatRepository.findByUsers([reqUserId, userId]);
     return chat?.id || null;
+  },
+  createRating: (authorId: number, userId: number, data: RatingCreateType) => {
+    return prisma.rating.create({
+      data: {
+        rating: data.rating,
+        comment: data.comment,
+        author: { connect: { id: authorId } },
+        user: { connect: { id: userId } },
+      },
+    });
+  },
+  getRatings: (userId: number, query: RatingGetType) => {
+    return prisma.rating.findMany({
+      where: { user: { id: userId } },
+      take: query.limit || undefined,
+      skip: query.offset || undefined,
+      orderBy: { createdAt: "desc" },
+      include: { author: true },
+    });
+  },
+  findRatingByAuthorId(userId: number, authorId: number) {
+    return prisma.rating.findFirst({
+      where: { user: { id: userId }, author: { id: authorId } },
+    });
   },
 };
 

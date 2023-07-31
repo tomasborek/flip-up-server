@@ -23,7 +23,8 @@ model User {
   bio      String?
   avatar   String?
   socials  Social[]
-  ratings  Rating[]
+  ratings  Rating[] @relation("UserRating")
+  ratedBy  Rating[] @relation("AuthorRating")
   listings Listing[]
   interests Category[]
   following User[] @relation("Following")
@@ -50,8 +51,10 @@ model Rating {
   id        Int      @id @default(autoincrement())
   rating    Int
   comment   String?
+  user      User     @relation(fields: [userId], references: [id], name: "UserRating")
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  author User @relation(fields: [authorId], references: [id], name:"AuthorRating")
+  authorId Int
   createdAt DateTime @default(now())
 }
 

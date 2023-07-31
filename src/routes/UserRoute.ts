@@ -9,6 +9,7 @@ import SocialValidator from "@validators/SocialValidator";
 import multer from "multer";
 import { unprotectedRoute } from "@middlewares/unprotectedRoute";
 import UserRepository from "@repositories/UserRepository";
+import RatingValidator from "@validators/RatingValidator";
 const upload = multer({ storage: multer.memoryStorage() });
 
 const UserRouter = Router();
@@ -78,5 +79,17 @@ UserRouter.post(
 );
 
 UserRouter.get("/chat", controller(UserController.getChats));
+
+UserRouter.post(
+  "/:userId/rating",
+  validate(RatingValidator.create),
+  controller(UserController.createRating)
+);
+
+UserRouter.get(
+  "/:userId/rating",
+  validateQuery(RatingValidator.get),
+  controller(UserController.getRatings)
+);
 
 export default UserRouter;
