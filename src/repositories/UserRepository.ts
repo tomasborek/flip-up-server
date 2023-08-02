@@ -1,6 +1,10 @@
 import { prisma } from "@db/prisma";
 import { Prisma } from "@prisma/client";
-import { UserCreateType, UserUpdateType } from "@validators/UserValidators";
+import {
+  UserCreateType,
+  UserGetManyType,
+  UserUpdateType,
+} from "@validators/UserValidators";
 import ChatRepository from "./ChatRepository";
 import { RatingCreateType, RatingGetType } from "@validators/RatingValidator";
 
@@ -35,48 +39,38 @@ const UserRepository = {
       include: { socials: true, interests: true },
     });
   },
-  getMany: (options?: {
-    limit?: number;
-    orderBy?: { followers?: boolean };
-    include?: { socials?: boolean; interests: boolean; counts?: boolean };
-    query?: {
-      username?: string;
-      followedByUsername?: string;
-      followingUsername?: string;
-    };
-  }) => {
+  getMany: (query: UserGetManyType) => {
     return prisma.user.findMany({
       where: {
-        username: options?.query?.username || undefined,
-        followers: options?.query?.followedByUsername
+        username: query?.username || undefined,
+        followers: query?.followedByUsername
           ? {
-              some: { username: options?.query?.followedByUsername },
+              some: { username: query?.followedByUsername },
             }
           : undefined,
-        following: options?.query?.followingUsername
+        following: query?.followingUsername
           ? {
-              some: { username: options?.query?.followingUsername },
+              some: { username: query?.followingUsername },
             }
           : undefined,
       },
-      take: options?.limit || 20,
-      orderBy: options?.orderBy?.followers
-        ? { followers: { _count: "desc" } }
-        : undefined,
-      include: {
-        socials: options?.include?.socials || undefined,
-        interests: options?.include?.interests || undefined,
-        _count: options?.include?.counts
-          ? {
-              select: {
-                listings: true,
-                followers: true,
-                following: true,
-                ratings: true,
-                interests: true,
-              },
-            }
+      take: Number(query.limit) || 20,
+      orderBy:
+        query.orderBy === "followers"
+          ? { followers: { _count: "desc" } }
           : undefined,
+      include: {
+        socials: true,
+        interests: true,
+        _count: {
+          select: {
+            listings: true,
+            followers: true,
+            following: true,
+            ratings: true,
+            interests: true,
+          },
+        },
       },
     });
   },
@@ -165,11 +159,12 @@ const UserRepository = {
   },
   amIFollowing: async (userId: number, reqUserId?: number) => {
     if (!reqUserId) return false;
-    const users = await UserRepository.getFollowerById(reqUserId, userId);
+    const users = await UserRepository.getFollowerById(userId, reqUserId);
     return Number(users?.length) > 0;
   },
-  amIFollowedBy: async (userId: number, reqUserId: number) => {
-    const users = await UserRepository.getFollowerById(userId, reqUserId);
+  amIFollowedBy: async (userId: number, reqUserId: number | undefined) => {
+    if (!reqUserId) return false;
+    const users = await UserRepository.getFollowerById(reqUserId, userId);
     return Number(users?.length) > 0;
   },
   getChatId: async (reqUserId: number, userId: number) => {

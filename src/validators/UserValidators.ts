@@ -50,5 +50,6 @@ const UserValidator = {
 
 export type UserCreateType = z.infer<typeof UserValidator.create>;
 export type UserUpdateType = z.infer<typeof UserValidator.update>;
+export type UserGetManyType = z.infer<typeof UserValidator.getMany>;
 
 export default UserValidator;

@@ -108,37 +108,36 @@ const UserController = {
     });
   },
   getMany: async (req: Request, res: Response) => {
-    const users = await UserRepository.getMany({
-      limit: Number(req.query.limit) || undefined,
-      orderBy: { followers: req.query.orderBy === "followers" || undefined },
-      include: { socials: true, interests: true, counts: true },
-      query: {
-        username: req.query.username as string | undefined,
-        followedByUsername:
-          (req.query.followedByUsername as string) || undefined,
-        followingUsername: (req.query.followingUsername as string) || undefined,
-      },
-    });
+    const users = await UserRepository.getMany(req.query);
     return response({
       res,
       status: 200,
       message: "Successfully retrieved user",
       data: {
-        users: users.map((user) => {
-          return {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            bio: user.bio,
-            admin: user.admin,
-            socials: user.socials,
-            avatar: user.avatar,
-            interests: user.interests,
-            _count: user._count,
-            following: UserRepository.amIFollowing(user.id, req.user?.id),
-            me: Number(req.user?.id) === user.id,
-          };
-        }),
+        users: await Promise.all(
+          users.map(async (user) => {
+            return {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              bio: user.bio,
+              admin: user.admin,
+              socials: user.socials,
+              avatar: user.avatar,
+              interests: user.interests,
+              _count: user._count,
+              following: await UserRepository.amIFollowing(
+                user.id,
+                req.user?.id
+              ),
+              beingFollowed: await UserRepository.amIFollowedBy(
+                user.id,
+                req.user?.id
+              ),
+              me: Number(req.user?.id) === user.id,
+            };
+          })
+        ),
       },
     });
   },

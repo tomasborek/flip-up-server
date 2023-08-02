@@ -46,6 +46,7 @@ UserRouter.get(
 
 UserRouter.use(protectedRoute);
 UserRouter.post("/:userId/follower", controller(UserController.followUser));
+UserRouter.delete("/:userId/follower", controller(UserController.unfollowUser));
 
 UserRouter.get("/me", controller(UserController.getMe));
 UserRouter.patch(
