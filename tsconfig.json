@@ -9,6 +9,7 @@
     "sourceMap": true,
     "rootDir": "./",
     "baseUrl": ".",
+    "jsx": "react",
     "paths": {
       "@routes/*": ["src/routes/*"],
       "@db/*": ["src/db/*"],
