@@ -32,6 +32,25 @@ model User {
   likedListings Listing[] @relation("Liked")
   chats Chat[] @relation("ChatUsers")
   messages Message[]
+  verified Boolean @default(false)
+  verificationToken VerificationToken?
+  resetToken ResetToken?
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int @unique
+  createdAt DateTime @default(now())
+}
+
+model ResetToken {
+  id Int @id @default(autoincrement())
+  token String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int @unique
+  createdAt DateTime @default(now())
 }
 
 model Social {

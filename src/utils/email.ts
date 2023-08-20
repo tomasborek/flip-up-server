@@ -1,25 +1,23 @@
 import nodemailer from "nodemailer";
-import TestMail from "../../emails";
-import {render} from "@react-email/render";
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.abc.cz",
-    port: 465,
-    secure: true,
-    auth: {
-        user: "my_user",
-        pass: "my_password",
-    },
+  host: "smtp.mailersend.net",
+  port: 587 * 1,
+  secure: false,
+  auth: {
+    user: "MS_S6IxBT@flipup.cz",
+    pass: "nEEa0QeKbellp5NW",
+  },
+  tls: {
+    ciphers: "SSLv3",
+  },
 });
 
-export const sendEmail = async (to: string, html: string) => {
-    await transporter.sendMail({
-        from: '"Test 👻" <test@abc.cz>',
-        to,
-        subject: "Test mail",
-        html,
-})};
-
-const emailHtml = render(TestMail());
-
-sendEmail("a@a.cz", emailHtml);
+export const sendEmail = async (to: string, subject: string, html: string) => {
+  await transporter.sendMail({
+    from: "dev@flipup.cz",
+    to,
+    subject,
+    html,
+  });
+};

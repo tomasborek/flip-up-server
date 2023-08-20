@@ -39,6 +39,14 @@ const UserRepository = {
       include: { socials: true, interests: true },
     });
   },
+  verify: (userId: number) => {
+    return prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: { verified: true },
+    });
+  },
   getMany: (query: UserGetManyType) => {
     return prisma.user.findMany({
       where: {

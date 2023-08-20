@@ -46,6 +46,9 @@ const UserValidator = {
     limit: z.number().int().min(1).max(50),
     offset: z.number().int().positive(),
   }),
+  resetPassword: z.object({
+    password: z.string().min(8).max(65),
+  }),
 };
 
 export type UserCreateType = z.infer<typeof UserValidator.create>;

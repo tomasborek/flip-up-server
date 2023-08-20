@@ -4,6 +4,7 @@ import { comparePassword, hashPassword } from "@utils/bcrypt";
 import { signToken } from "@utils/jwt";
 import { response } from "@utils/response";
 import SocialRepository from "@repositories/SocialRepository";
+import { render } from "@react-email/render";
 import {
   deleteImage,
   isImages,
@@ -14,6 +15,11 @@ import {
 import path from "path";
 import CategoryRepository from "@repositories/CategoryRepository";
 import ChatRepository from "@repositories/ChatRepository";
+import VerificationTokenRepository from "@repositories/VerificationTokenRepository";
+import { sendEmail } from "@utils/email";
+import VerificationEmail from "emails/VerificationEmail";
+import ResetEmail from "emails/ResetEmail";
+import ResetTokenRepository from "@repositories/ResetTokenRepository";
 
 const UserController = {
   login: async (req: Request, res: Response) => {
@@ -53,6 +59,14 @@ const UserController = {
       ...req.body,
       password: hashedPassword,
     });
+    const verification = await VerificationTokenRepository.create(user.id);
+
+    await sendEmail(
+      user.email,
+      "Ověř svůj e-mail",
+      render(VerificationEmail(verification.token))
+    );
+
     const token = signToken({
       id: user.id,
       username: user.username,
@@ -80,6 +94,58 @@ const UserController = {
       res,
       status: 200,
       message: "Password updates succesfully",
+    });
+  },
+  resetPassword: async (req: Request, res: Response) => {
+    const resetToken = await ResetTokenRepository.findByToken(req.params.token);
+    if (!resetToken) {
+      return response({
+        res,
+        status: 404,
+        message: "Token not found",
+      });
+    }
+    const hashedPassword = await hashPassword(req.body.password);
+    await UserRepository.updatePassword(resetToken.userId, hashedPassword);
+    await ResetTokenRepository.delete(resetToken.id);
+
+    response({
+      res,
+      status: 200,
+      message: "Password reset succesfully",
+    });
+  },
+  sendResetEmail: async (req: Request, res: Response) => {
+    const user = await UserRepository.findByEmail(req.params.userEmail);
+    if (!user)
+      return response({
+        res,
+        status: 404,
+        message: "User not found",
+      });
+    const existingResetToken = await ResetTokenRepository.findByUserId(user.id);
+    if (existingResetToken) {
+      await ResetTokenRepository.delete(existingResetToken.id);
+    }
+    const resetToken = await ResetTokenRepository.create(user.id);
+    try {
+      await sendEmail(
+        user.email,
+        "Změna hesla",
+        render(ResetEmail(resetToken.token))
+      );
+    } catch (error) {
+      return response({
+        res,
+        status: 500,
+        message: "Internal server error",
+      });
+    }
+
+    response({
+      res,
+      status: 200,
+      message: "Reset email sent",
     });
   },
   delete: async (req: Request, res: Response) => {
@@ -139,6 +205,20 @@ const UserController = {
           })
         ),
       },
+    });
+  },
+  verifyEmail: async (req: Request, res: Response) => {
+    const verification = await VerificationTokenRepository.findByToken(
+      req.params.token
+    );
+    if (!verification)
+      return response({ res, status: 404, message: "Verification not found" });
+    await UserRepository.verify(verification.userId);
+    await VerificationTokenRepository.delete(verification.id);
+    return response({
+      res,
+      status: 200,
+      message: "Successfully verified email",
     });
   },
   addSocial: async (req: Request, res: Response) => {
