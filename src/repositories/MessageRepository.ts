@@ -18,8 +18,11 @@ const MessageRepository = {
       where: { chatId },
     });
   },
-  addImage: (id: number, image: string) => {
-    return prisma.message.update({ where: { id }, data: { image } });
+  addImage: (id: number, fileName: string) => {
+    return prisma.message.update({
+      where: { id },
+      data: { image: `${process.env.ROOT_URL}/uploads/messages/${fileName}` },
+    });
   },
 };
 

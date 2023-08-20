@@ -191,6 +191,7 @@ const UserController = {
               socials: user.socials,
               avatar: user.avatar,
               interests: user.interests,
+              lastActive: user.lastActive,
               _count: user._count,
               following: await UserRepository.amIFollowing(
                 user.id,

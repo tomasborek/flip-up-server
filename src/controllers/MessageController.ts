@@ -28,11 +28,15 @@ const MessageController = {
 
     const resizedImage = await resizeImage(req.file.buffer);
     await writeImage({
-      path: path.join("uploads", "messages"),
+      path: path.join("uploads", "messages", fileName),
       buffer: resizedImage,
     });
     await MessageRepository.addImage(message.id, fileName);
-    return res.status(200).json(null);
+    return response({
+      res,
+      status: 200,
+      message: "Image added",
+    });
   },
 };
 
