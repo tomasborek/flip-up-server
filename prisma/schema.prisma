@@ -141,16 +141,17 @@ model Message{
 
 model Report {
   id  Int  @id @default(autoincrement())
-  author User @relation(fields: [authorId], references: [id], name: "Reported")
+  author User @relation(fields: [authorId], references: [id], name: "Reported", onDelete: Cascade)
   authorId Int
-  user User? @relation(fields: [userId], references: [id], name: "Reports")
+  user User? @relation(fields: [userId], references: [id], name: "Reports", onDelete: Cascade)
   userId Int?
-  listing Listing? @relation(fields: [listingId], references: [id])
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
   listingId Int?
-  message Message? @relation(fields: [messageId], references: [id])
+  message Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
   messageId Int?
   type ReportType
   text String?
+  createdAt DateTime @default(now())
 }
 
 enum ReportType {

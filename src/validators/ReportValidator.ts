@@ -13,9 +13,10 @@ const ReportValidator = {
   findMany: z
     .object({
       type: z.enum(["EXPLICIT", "SPAM", "OTHER"]).optional(),
-      listingId: z.number().int().positive().optional(),
-      userId: z.number().int().positive().optional(),
-      messageId: z.number().int().positive().optional(),
+      listingId: z.string().optional(),
+      userId: z.string().optional(),
+      messageId: z.string().optional(),
+      offset: z.string().optional(),
     })
     .strict(),
 };

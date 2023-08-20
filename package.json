@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "tsx src/index.ts --watch",
     "build": "esbuild ./src --bundle --minify --platform=node --target=node18 --outfile=./dist/index.js",
     "start:prod": "npm run build && clear && node dist/index.js",
     "emailDev": "email dev"

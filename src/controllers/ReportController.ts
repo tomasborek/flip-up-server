@@ -16,11 +16,48 @@ const ReportController = {
   },
   findMany: async (req: Request, res: Response) => {
     const reports = await ReportRepository.findMany(req.query);
+    console.log(reports);
     return response({
       res,
       status: 200,
       message: "Report found succesfully",
-      data: { reports },
+      data: {
+        reports: await Promise.all(
+          reports.map(async (r) => {
+            return {
+              ...r,
+              listing: r.listing
+                ? {
+                    id: r.listing.id,
+                    title: r.listing.title,
+                  }
+                : null,
+              user: r.user
+                ? {
+                    avatar: r.user.avatar,
+                    id: r.user.id,
+                    username: r.user.username,
+                  }
+                : null,
+              message: r.message
+                ? {
+                    ...r.message,
+                    user: {
+                      id: r.message.user.id,
+                      username: r.message.user.username,
+                      avatar: r.message.user.avatar,
+                    },
+                  }
+                : null,
+              author: {
+                id: r.author.id,
+                username: r.author.username,
+                avatar: r.author.avatar,
+              },
+            };
+          })
+        ),
+      },
     });
   },
   findOne: async (req: Request, res: Response) => {

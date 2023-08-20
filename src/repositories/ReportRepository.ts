@@ -16,11 +16,19 @@ const ReportRepository = {
   findMany: (query: ReportFindManyType) => {
     return prisma.report.findMany({
       where: {
-        type: query.type,
-        listingId: query.listingId,
-        userId: query.userId,
-        messageId: query.messageId,
+        type: query.type || undefined,
+        listingId: Number(query.listingId) || undefined,
+        userId: Number(query.userId) || undefined,
+        messageId: Number(query.messageId) || undefined,
       },
+      skip: Number(query.offset) || 0,
+      include: {
+        author: true,
+        listing: true,
+        user: true,
+        message: { include: { user: true, referencedListing: true } },
+      },
+      orderBy: { createdAt: "desc" },
     });
   },
   findByType: (type: ReportCreateType["type"]) => {
