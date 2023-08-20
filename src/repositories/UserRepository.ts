@@ -147,22 +147,14 @@ const UserRepository = {
       data: { interests: { disconnect: categoryIds.map((id) => ({ id })) } },
     });
   },
-  getChats: (
-    id: number,
-    options?: {
-      include?: { users?: boolean };
-      getLastMessage?: boolean;
-      orderBy?: "desc" | "asc";
-      onlyOtherUser?: boolean;
-    }
-  ) => {
+  getChats: (id: number) => {
     return prisma.chat.findMany({
       where: { users: { some: { id } } },
       include: {
-        users: options?.include?.users ? true : undefined,
-        messages: options?.getLastMessage ? { take: 1 } : undefined,
+        users: true,
+        messages: { take: 1, orderBy: { createdAt: "desc" } },
       },
-      orderBy: { updatedAt: options?.orderBy || "desc" },
+      orderBy: { updatedAt: "desc" },
     });
   },
   amIFollowing: async (userId: number, reqUserId?: number) => {

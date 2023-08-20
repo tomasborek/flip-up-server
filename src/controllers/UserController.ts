@@ -377,11 +377,7 @@ const UserController = {
     return res.status(200).send(null);
   },
   getChats: async (req: Request, res: Response) => {
-    const chats = await UserRepository.getChats(req.user!.id, {
-      getLastMessage: true,
-      orderBy: "desc",
-      include: { users: true },
-    });
+    const chats = await UserRepository.getChats(req.user!.id);
 
     response({
       res,
@@ -400,7 +396,10 @@ const UserController = {
                 avatar: otherUser.avatar,
               },
               isUnread: !read,
-              lastMessage: c.messages[0],
+              lastMessage: {
+                id: c.messages[0]?.id,
+                text: c.messages[0]?.text,
+              },
               updatedAt: c.updatedAt,
             };
           })
