@@ -32,6 +32,8 @@ model User {
   likedListings Listing[] @relation("Liked")
   chats Chat[] @relation("ChatUsers")
   messages Message[]
+  reports Report[] @relation("Reports")
+  reported Report[] @relation("Reported")
   verified Boolean @default(false)
   verificationToken VerificationToken?
   resetToken ResetToken?
@@ -91,6 +93,7 @@ model Listing{
   likedBy     User[] @relation("Liked")
   sentIn Message[] @relation("SentListing")
   referencedIn Message[]
+  reports Report[]
 }
 
 model Image{
@@ -133,8 +136,28 @@ model Message{
   read Boolean @default(false)
   referencedListing Listing? @relation(fields: [referencedListingId], references: [id])
   referencedListingId Int?
+  reports Report[]
 }
 
+model Report {
+  id  Int  @id @default(autoincrement())
+  author User @relation(fields: [authorId], references: [id], name: "Reported")
+  authorId Int
+  user User? @relation(fields: [userId], references: [id], name: "Reports")
+  userId Int?
+  listing Listing? @relation(fields: [listingId], references: [id])
+  listingId Int?
+  message Message? @relation(fields: [messageId], references: [id])
+  messageId Int?
+  type ReportType
+  text String?
+}
+
+enum ReportType {
+  EXPLICIT
+  SPAM
+  OTHER
+}
 
 
 

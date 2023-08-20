@@ -19,6 +19,7 @@ import MessageRouter from "@routes/MessageRoute";
 import logger from "./utils/logger";
 import { response } from "@utils/response";
 import ResetTokenRouter from "@routes/ResetTokenRoute";
+import ReportRouter from "@routes/ReportRoute";
 
 const allowlist = [
   "https://flipup.cz",
@@ -51,6 +52,10 @@ app.use("/uploads", UploadRouter);
 app.use("/chat", ChatRouter);
 app.use("/message", MessageRouter);
 app.use("/reset-token", ResetTokenRouter);
+app.use("/report", ReportRouter);
+app.use("/health", (req: Request, res: Response) => {
+  response({ res, status: 200, message: "OK" });
+});
 
 app.use((req: Request, res: Response) => {
   response({
