@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx src/index.ts --watch",
     "build": "esbuild ./src --bundle --minify --platform=node --target=node18 --outfile=./dist/index.js",
-    "start:prod": "npm run build && clear && node dist/index.js",
+    "start:prod": "npm run build && npx prisma db push && clear && node dist/index.js",
     "emailDev": "email dev"
   },
   "keywords": [],
@@ -51,6 +51,7 @@
     "@types/morgan": "^1.9.4",
     "@types/nodemailer": "^6.4.9",
     "@types/react": "^18.2.20",
+    "esbuild": "^0.19.2",
     "eslint": "^8.47.0",
     "tsc-alias": "^1.8.6",
     "tsx": "^3.12.7"

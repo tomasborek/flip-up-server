@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.mailersend.net",
+  host: process.env.EMAIL_HOST,
   port: 587 * 1,
   secure: false,
   auth: {
-    user: "MS_S6IxBT@flipup.cz",
-    pass: "nEEa0QeKbellp5NW",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
     ciphers: "SSLv3",
