@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx src/index.ts --watch",
-    "build": "esbuild ./src --bundle --minify --platform=node --target=node18 --outfile=./dist/index.js",
+    "build": "tsc && tsc-alias",
     "start:prod": "npm run build && npx prisma db push && clear && node dist/index.js",
     "emailDev": "email dev"
   },
