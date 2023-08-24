@@ -1,4 +1,4 @@
-import { prisma } from "@db/prisma";
+import { prisma } from "@utils/prisma";
 const VerificationTokenRepository = {
   create: (userId: number) => {
     return prisma.verificationToken.create({

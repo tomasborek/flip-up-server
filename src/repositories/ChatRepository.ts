@@ -1,4 +1,4 @@
-import { prisma } from "@db/prisma";
+import { prisma } from "@utils/prisma";
 import { ChatCreateType } from "@validators/ChatValidator";
 const ChatRepository = {
   create: (reqUserId: number, data: ChatCreateType) => {

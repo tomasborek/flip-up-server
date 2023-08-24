@@ -13,7 +13,6 @@
     "jsx": "react",
     "paths": {
       "@routes/*": ["src/routes/*"],
-      "@db/*": ["src/db/*"],
       "@interfaces/*": ["src/interfaces/*"],
       "@middlewares/*": ["src/middlewares/*"],
       "@lib/*": ["src/lib/*"],

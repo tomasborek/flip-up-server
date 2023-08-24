@@ -2,7 +2,7 @@ import {
   ReportCreateType,
   ReportFindManyType,
 } from "@validators/ReportValidator";
-import { prisma } from "@db/prisma";
+import { prisma } from "@utils/prisma";
 const ReportRepository = {
   create: (authorId: number, data: ReportCreateType) => {
     return prisma.report.create({ data: { ...data, authorId } });

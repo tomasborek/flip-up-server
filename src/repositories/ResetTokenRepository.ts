@@ -1,4 +1,4 @@
-import { prisma } from "@db/prisma";
+import { prisma } from "@utils/prisma";
 const ResetTokenRepository = {
   create: (userId: number) => {
     const token = `${Date.now()}${Math.random().toString(36).substr(2, 5)}`;

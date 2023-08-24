@@ -20,51 +20,62 @@ import logger from "./utils/logger";
 import { response } from "@utils/response";
 import ResetTokenRouter from "@routes/ResetTokenRoute";
 import ReportRouter from "@routes/ReportRoute";
+import { connect } from "@utils/prisma";
 
-const allowlist = [
-  "https://flipup.cz",
-  "https://www.flipup.cz",
-  "http://localhost:3000",
-];
-const corsOptionsDelegate = function (req: Request, callback: any) {
-  let corsOptions;
-  if (allowlist.includes(req.header("Origin") || "")) {
-    corsOptions = { origin: true };
-  } else {
-    corsOptions = { origin: false };
-  }
-  callback(null, corsOptions);
-};
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-app.use(express.json());
-app.use(cors(corsOptionsDelegate));
-app.use(cookieParser());
-app.use(
-  morgan(":method [:url] :status = :response-time ms - :res[content-length]")
-);
+(async () => {
+  connect()
+    .then(() => {
+      logger.info("Connected to database");
+    })
+    .catch((err) => {
+      logger.error(`Error connecting to database: ${err}`);
+    });
 
-app.use("/user", UserRouter);
-app.use("/social", SocialRouter);
-app.use("/city", CityRouter);
-app.use("/category", CategoryRouter);
-app.use("/listing", ListingRouter);
-app.use("/uploads", UploadRouter);
-app.use("/chat", ChatRouter);
-app.use("/message", MessageRouter);
-app.use("/reset-token", ResetTokenRouter);
-app.use("/report", ReportRouter);
-app.use("/health", (req: Request, res: Response) => {
-  response({ res, status: 200, message: "OK" });
-});
+  const allowlist = [
+    "https://flipup.cz",
+    "https://www.flipup.cz",
+    "http://localhost:3000",
+  ];
+  const corsOptionsDelegate = function (req: Request, callback: any) {
+    let corsOptions;
+    if (allowlist.includes(req.header("Origin") || "")) {
+      corsOptions = { origin: true };
+    } else {
+      corsOptions = { origin: false };
+    }
+    callback(null, corsOptions);
+  };
+  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+  app.use(express.json());
+  app.use(cors(corsOptionsDelegate));
+  app.use(cookieParser());
+  app.use(
+    morgan(":method [:url] :status = :response-time ms - :res[content-length]")
+  );
 
-app.use((req: Request, res: Response) => {
-  response({
-    res,
-    status: 404,
-    message: "Not found",
+  app.use("/user", UserRouter);
+  app.use("/social", SocialRouter);
+  app.use("/city", CityRouter);
+  app.use("/category", CategoryRouter);
+  app.use("/listing", ListingRouter);
+  app.use("/uploads", UploadRouter);
+  app.use("/chat", ChatRouter);
+  app.use("/message", MessageRouter);
+  app.use("/reset-token", ResetTokenRouter);
+  app.use("/report", ReportRouter);
+  app.use("/health", (req: Request, res: Response) => {
+    response({ res, status: 200, message: "OK" });
   });
-});
 
-app.listen(process.env.PORT || 8080, () => {
-  logger.info("Server is running on port 8080");
-});
+  app.use((req: Request, res: Response) => {
+    response({
+      res,
+      status: 404,
+      message: "Not found",
+    });
+  });
+
+  app.listen(process.env.PORT || 8080, () => {
+    logger.info("Server is running on port 8080");
+  });
+})();
