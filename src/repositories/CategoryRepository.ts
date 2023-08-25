@@ -2,11 +2,14 @@ import { prisma } from "@utils/prisma";
 import { CategoryCreateType } from "@validators/CategoryValidator";
 
 const CategoryRepository = {
-  create: (data: CategoryCreateType) => {
+  create: (data: CategoryCreateType, parentCategoryTitle: string | null) => {
     return prisma.category.create({
       data: {
         title: data.title,
         core: data.core,
+        slug: `${data.title.replace(" ", "-")}-${
+          parentCategoryTitle?.replace(" ", "-") || "core"
+        }`.toLowerCase(),
         applicable: data.applicable,
         icon: data.icon,
         parentCategories: data.parentCategoryId

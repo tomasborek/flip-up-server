@@ -10,6 +10,7 @@
     "sourceMap": true,
     "rootDir": "./",
     "baseUrl": ".",
+    "lib": ["ES2015", "ES2017", "dom"],
     "jsx": "react",
     "paths": {
       "@routes/*": ["src/routes/*"],

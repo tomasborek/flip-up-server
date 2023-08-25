@@ -107,6 +107,7 @@ model Image{
 model Category{
   id        Int      @id @default(autoincrement())
   title     String
+  slug     String @unique
   parentCategories Category[] @relation("SubCategories")
   subCategories Category[] @relation("SubCategories")
   listings Listing[]

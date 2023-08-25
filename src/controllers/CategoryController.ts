@@ -4,7 +4,21 @@ import CategoryRepository from "@repositories/CategoryRepository";
 
 const CategoryController = {
   create: async (req: Request, res: Response) => {
-    await CategoryRepository.create(req.body);
+    let parentCategoryTitle: string | null = null;
+    if (req.body.parentCategoryId) {
+      const parentCategory = await CategoryRepository.findById(
+        req.body.parentCategoryId
+      );
+      if (!parentCategory) {
+        return response({
+          res,
+          status: 404,
+          message: "Parent category not found",
+        });
+      }
+      parentCategoryTitle = parentCategory.title;
+    }
+    await CategoryRepository.create(req.body, parentCategoryTitle);
     response({
       res,
       status: 201,
