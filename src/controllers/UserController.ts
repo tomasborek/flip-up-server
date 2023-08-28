@@ -9,6 +9,7 @@ import {
   deleteImage,
   isImages,
   nameImage,
+  readImage,
   resizeImage,
   writeImage,
 } from "@utils/storage";
@@ -339,7 +340,13 @@ const UserController = {
     if (!user) return response({ res, status: 404, message: "User not found" });
     if (user.avatar) {
       const fileName = user.avatar.split("/").pop();
-      await deleteImage(path.join("uploads", "avatars", fileName!));
+      try {
+        const file = await readImage(
+          path.join("uploads", "avatars", fileName!)
+        );
+        if (!file) throw new Error("File not found");
+        await deleteImage(path.join("uploads", "avatars", fileName!));
+      } catch {}
     }
     await UserRepository.update(req.user!.id, { avatar: null });
     return response({

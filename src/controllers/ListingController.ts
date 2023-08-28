@@ -6,6 +6,7 @@ import {
   deleteImage,
   isImages,
   nameImage,
+  readImage,
   resizeImage,
   writeImage,
 } from "@utils/storage";
@@ -35,16 +36,25 @@ const ListingController = {
 
     await ListingRepository.delete(Number(req.params.listingId));
     await Promise.all(
-      listing.images.map(
-        async (image) =>
+      listing.images.map(async (image) => {
+        try {
+          const file = await readImage(
+            path.join(
+              "uploads",
+              "listings",
+              image.url.split("/")[image.url.split("/").length - 1]
+            )
+          );
+          if (!file) throw new Error("File not found");
           await deleteImage(
             path.join(
               "uploads",
               "listings",
               image.url.split("/")[image.url.split("/").length - 1]
             )
-          )
-      )
+          );
+        } catch (error) {}
+      })
     );
     return response({
       res,
