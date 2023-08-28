@@ -21,6 +21,15 @@ export const readImage = (path: string) => {
   });
 };
 
+export const readImages = (path: string) => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(path, (err, files) => {
+      if (err) reject(err);
+      resolve(files);
+    });
+  });
+};
+
 export const writeImage = ({
   path,
   buffer,
