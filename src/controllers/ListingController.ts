@@ -91,14 +91,13 @@ const ListingController = {
         listing: {
           ...listing,
           userId: listing.userId,
-          liked: await ListingRepository.isLiked(req.user!.id, listing.id),
-          owned: await ListingRepository.isOwned(req.user!.id, listing.id),
+          liked: await ListingRepository.isLiked(req.user?.id, listing.id),
+          owned: await ListingRepository.isOwned(req.user?.id, listing.id),
           user: {
             ...listing.user,
-            chatId: await UserRepository.getChatId(
-              req.user!.id,
-              listing.userId
-            ),
+            chatId: !req.user
+              ? null
+              : await UserRepository.getChatId(req.user.id, listing.userId),
           },
         },
       },
