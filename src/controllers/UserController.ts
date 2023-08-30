@@ -317,12 +317,12 @@ const UserController = {
     if (!user) return response({ res, status: 404, message: "User not found" });
     if (user.avatar) {
       const fileName = user.avatar.split("/").pop();
-      await deleteImage(path.join("uploads", "avatars", fileName!));
+      await deleteImage(`avatars/${fileName}`);
     }
     const fileName = nameImage(req.file.originalname, user.id);
     const resizedImageBuffer = await resizeImage(req.file.buffer);
 
-    const resp = await writeImage({
+    await writeImage({
       type: "avatars",
       buffer: resizedImageBuffer,
       fileName,
