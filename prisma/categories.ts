@@ -284,9 +284,4 @@ export const categories: Category[] = [
     slug: "zvirata-core",
     core: true,
   },
-  {
-    title: "test 12",
-    slug: "test-12-core",
-    core: true,
-  },
 ];

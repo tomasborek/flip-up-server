@@ -1,7 +1,11 @@
 import { prisma } from "@utils/prisma";
 import { MessageCreateType } from "@validators/MessageValidator";
 const MessageRepository = {
-  create: (userId: number, chatId: number, data: MessageCreateType) => {
+  create: async (userId: number, chatId: number, data: MessageCreateType) => {
+    await prisma.chat.update({
+      where: { id: chatId },
+      data: { updatedAt: new Date() },
+    });
     return prisma.message.create({
       data: {
         ...data,
