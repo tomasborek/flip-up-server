@@ -319,12 +319,13 @@ const UserController = {
       const fileName = user.avatar.split("/").pop();
       await deleteImage(path.join("uploads", "avatars", fileName!));
     }
-    const fileName = nameImage(req.file.originalname);
+    const fileName = nameImage(req.file.originalname, user.id);
     const resizedImageBuffer = await resizeImage(req.file.buffer);
 
-    await writeImage({
-      path: path.join("uploads", "avatars", fileName),
+    const resp = await writeImage({
+      type: "avatars",
       buffer: resizedImageBuffer,
+      fileName,
     });
     await UserRepository.update(req.user!.id, {
       avatar: `${process.env.ROOT_URL}/uploads/avatars/${fileName}`,
@@ -341,11 +342,9 @@ const UserController = {
     if (user.avatar) {
       const fileName = user.avatar.split("/").pop();
       try {
-        const file = await readImage(
-          path.join("uploads", "avatars", fileName!)
-        );
+        const file = await readImage(`avatars/${fileName}`);
         if (!file) throw new Error("File not found");
-        await deleteImage(path.join("uploads", "avatars", fileName!));
+        await deleteImage(`avatars/${fileName}`);
       } catch {}
     }
     await UserRepository.update(req.user!.id, { avatar: null });
@@ -367,7 +366,6 @@ const UserController = {
     const categoriesToConnect = newInterests.filter((newInterest) =>
       interests.every((interest) => interest.id !== newInterest!.id)
     );
-    console.log(categoriesToConnect);
 
     const categoriesToDisconnect = interests.filter(
       (interest) => !req.body.categoryIds.includes(interest.id)

@@ -16,7 +16,6 @@ const ReportController = {
   },
   findMany: async (req: Request, res: Response) => {
     const reports = await ReportRepository.findMany(req.query);
-    console.log(reports);
     return response({
       res,
       status: 200,

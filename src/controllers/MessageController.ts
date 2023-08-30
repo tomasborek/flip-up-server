@@ -24,11 +24,12 @@ const MessageController = {
         message: "Message already has an image",
       });
     }
-    const fileName = nameImage(req.file.originalname);
+    const fileName = nameImage(req.file.originalname, req.user!.id, message.id);
 
     const resizedImage = await resizeImage(req.file.buffer);
     await writeImage({
-      path: path.join("uploads", "messages", fileName),
+      type: "message-attachments",
+      fileName,
       buffer: resizedImage,
     });
     await MessageRepository.addImage(message.id, fileName);

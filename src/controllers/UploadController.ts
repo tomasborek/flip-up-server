@@ -1,46 +1,46 @@
 import { response } from "@utils/response";
-import { readImage, readImages } from "@utils/storage";
+import { readImage, readableToBuffer } from "@utils/storage";
 import { Request, Response } from "express";
 import path from "path";
 const UploadController = {
   getListingImage: async (req: Request, res: Response) => {
-    const file = await readImage(
-      path.join("uploads", "listings", req.params.filename)
-    );
-    if (!file)
+    const file = await readImage(`listing-images/${req.params.filename}`);
+    if (!file.Body)
       return response({
         res,
         status: 404,
         message: "File not found",
       });
+    const string = await readableToBuffer(file.Body);
     res.writeHead(200, { "Content-Type": "image/jpeg" });
-    return res.end(file);
+    res.write(string);
+    return res.end();
   },
   getAvatar: async (req: Request, res: Response) => {
-    const file = await readImage(
-      path.join("uploads", "avatars", req.params.filename)
-    );
-    if (!file)
+    const file = await readImage(`avatars/${req.params.filename}`);
+    if (!file.Body)
       return response({
         res,
         status: 404,
         message: "File not found",
       });
+    const string = await readableToBuffer(file.Body);
     res.writeHead(200, { "Content-Type": "image/jpeg" });
-    return res.end(file);
+    res.write(string);
+    return res.end();
   },
   getMessageImage: async (req: Request, res: Response) => {
-    const file = await readImage(
-      path.join("uploads", "messages", req.params.filename)
-    );
-    if (!file)
+    const file = await readImage(`message-attachments/${req.params.filename}`);
+    if (!file.Body)
       return response({
         res,
         status: 404,
         message: "File not found",
       });
+    const string = await readableToBuffer(file.Body);
     res.writeHead(200, { "Content-Type": "image/jpeg" });
-    return res.end(file);
+    res.write(string);
+    return res.end();
   },
 };
 

@@ -2,49 +2,41 @@ import fs, { WriteStream } from "fs";
 import path from "path";
 import { Express } from "express";
 import sharp from "sharp";
+import { s3client } from "./aws";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 
-export const deleteImage = (path: string) => {
-  return new Promise((resolve, reject) => {
-    fs.unlink(path, (err) => {
-      if (err) reject(err);
-      resolve(null);
-    });
-  });
+export const deleteImage = (key: string) => {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME!,
+    Key: key,
+  };
+  return s3client.send(new DeleteObjectCommand(params));
 };
 
-export const readImage = (path: string) => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, (err, buffer) => {
-      if (err) reject(err);
-      resolve(buffer);
-    });
-  });
-};
-
-export const readImages = (path: string) => {
-  return new Promise((resolve, reject) => {
-    fs.readdir(path, (err, files) => {
-      if (err) reject(err);
-      resolve(files);
-    });
-  });
+export const readImage = (key: string) => {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME!,
+    Key: key,
+  };
+  return s3client.send(new GetObjectCommand(params));
 };
 
 export const writeImage = ({
-  path,
+  fileName,
+  type,
   buffer,
 }: {
-  path: string;
+  fileName: string;
   buffer: Buffer;
+  type: "avatars" | "listing-images" | "message-attachments";
 }) => {
-  const writeStream = fs.createWriteStream(path);
-  return new Promise((resolve, reject) => {
-    writeStream.write(buffer);
-    writeStream.on("error", reject);
-    writeStream.on("finish", resolve);
-    writeStream.on("end", resolve);
-    writeStream.end();
-  });
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME!,
+    Key: `${type}/${fileName}`,
+    Body: buffer,
+  };
+  return s3client.send(new PutObjectCommand(params));
 };
 
 export const isImages = (images: Express.Multer.File[]) => {
@@ -53,7 +45,12 @@ export const isImages = (images: Express.Multer.File[]) => {
   return true;
 };
 
-export const nameImage = (originalName: string, id?: number) => {
+export const nameImage = (
+  originalName: string,
+  userId: number,
+  id?: number
+) => {
+  //filenames are in the format: <userId>_<id?>_<timestamp>_<filename>.jpg
   let fileName = originalName
     .replace(" ", "-")
     .replace("(", "-")
@@ -61,10 +58,27 @@ export const nameImage = (originalName: string, id?: number) => {
     .replace("/", "-")
     .replace("_", "-")
     .split(".")[0];
-  return `${id || ""}${Date.now().toString()}_${fileName.slice(0, 10)}.jpg`;
+  return `${userId}_${id || "0"}_${Date.now().toString()}_${fileName.slice(
+    0,
+    10
+  )}.jpg`;
 };
 
 export const resizeImage = (buffer: Buffer) => {
   const resizedImage = sharp(buffer).resize({ width: 500 }).jpeg();
   return resizedImage.toBuffer();
+};
+
+export const readableToBuffer = async (readableStream: any) => {
+  const chunks: Buffer[] = [];
+
+  for await (const chunk of readableStream) {
+    if (Buffer.isBuffer(chunk)) {
+      chunks.push(chunk);
+    } else {
+      throw new Error("Invalid data received from Readable stream");
+    }
+  }
+
+  return Buffer.concat(chunks);
 };

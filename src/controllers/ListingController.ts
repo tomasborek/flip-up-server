@@ -39,19 +39,15 @@ const ListingController = {
       listing.images.map(async (image) => {
         try {
           const file = await readImage(
-            path.join(
-              "uploads",
-              "listings",
+            `listing-images/${
               image.url.split("/")[image.url.split("/").length - 1]
-            )
+            }`
           );
           if (!file) throw new Error("File not found");
           await deleteImage(
-            path.join(
-              "uploads",
-              "listings",
+            `listing-images/${
               image.url.split("/")[image.url.split("/").length - 1]
-            )
+            }`
           );
         } catch (error) {}
       })
@@ -190,11 +186,9 @@ const ListingController = {
       await Promise.all(
         listing.images.map((i) => {
           return deleteImage(
-            path.join(
-              "uploads",
-              "listings",
-              i.url.split("/")[i.url.split("/").length - 1]
-            )
+            `listing-images/
+              ${i.url.split("/")[i.url.split("/").length - 1]}
+            `
           );
         })
       );
@@ -205,8 +199,9 @@ const ListingController = {
       const fileName = nameImage(file.originalname, listing.id);
       const resizedImageBuffer = await resizeImage(file.buffer);
       await writeImage({
-        path: path.join("uploads", "listings", fileName),
+        type: "listing-images",
         buffer: resizedImageBuffer,
+        fileName,
       });
       await ListingRepository.addImage(
         Number(req.params.listingId),
