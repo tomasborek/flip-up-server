@@ -31,7 +31,7 @@ const UserController = {
       user.password
     );
     if (!isPasswordValid)
-      return response({ res, status: 400, message: "Invalid password" });
+      return response({ res, status: 401, message: "Invalid password" });
     const token = signToken({
       id: user.id,
       username: user.username,
@@ -49,11 +49,20 @@ const UserController = {
   },
   create: async (req: Request, res: Response) => {
     const userExists = await UserRepository.findByEmail(req.body.email);
+    const usernameExists = await UserRepository.findByUsername(
+      req.body.username
+    );
     if (userExists)
       return response({
         res,
-        status: 400,
+        status: 409,
         message: "User with this email already exists",
+      });
+    if (usernameExists)
+      return response({
+        res,
+        status: 409,
+        message: "User with this username already exists",
       });
     const hashedPassword = await hashPassword(req.body.password);
     const user = await UserRepository.create({
