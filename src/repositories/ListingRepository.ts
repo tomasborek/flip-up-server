@@ -53,6 +53,7 @@ const ListingRepository = {
         likedBy: query.likedBy
           ? { some: { id: Number(query.likedBy) } }
           : undefined,
+        NOT: query.exclude ? { id: Number(query.exclude) } : undefined,
         category: query.category
           ? {
               OR: [

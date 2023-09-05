@@ -14,6 +14,7 @@ const ListingValidator = {
     limit: z.string().optional(),
     offset: z.string().optional(),
     byFollowed: z.string().optional(),
+    exclude: z.string().optional(),
   }),
   update: z
     .object({
