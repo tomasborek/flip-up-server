@@ -58,6 +58,15 @@ const ListingRepository = {
               OR: [
                 { id: Number(query.category) },
                 { parentCategories: { some: { id: Number(query.category) } } },
+                {
+                  parentCategories: {
+                    some: {
+                      parentCategories: {
+                        some: { id: Number(query.category) },
+                      },
+                    },
+                  },
+                },
               ],
             }
           : undefined,

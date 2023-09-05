@@ -100,7 +100,6 @@ const ListingController = {
     });
   },
   getMany: async (req: Request, res: Response) => {
-    const listings = await ListingRepository.getMany(req.query);
     if (req.query.userId && req.query.byFollowed)
       return response({
         res,
@@ -125,7 +124,7 @@ const ListingController = {
       if (!category)
         return response({ res, status: 404, message: "Category not found" });
     }
-
+    const listings = await ListingRepository.getMany(req.query);
     return response({
       res,
       status: 200,
