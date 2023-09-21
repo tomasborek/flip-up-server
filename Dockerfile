@@ -18,4 +18,4 @@ RUN npx prisma generate
 
 CMD ["npm", "run", "start:prod"]
 
-EXPOSE 8080
+EXPOSE 3030
